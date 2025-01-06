@@ -1,47 +1,35 @@
 var DT_bargraph = (function () {
     function buildHTML(me) {
         var width = me.block.width || $(me.mountPoint + ' .dt_block').width();
-        return '<div id="bargraph_' + me.block.idx + '" class="block_' +
+        return '<div id="bargraph-' + me.block.idx + '" class="block_' +
             me.block.type +
             ' col-xs-' +
             width +
             '">' +
+            '<div id="bargraph-icon-'+me.block.idx+'" class="bargraph-icon '+me.block.iconName+'"></div>' +
+            '<div id="bargraph-title-' + me.block.idx + '" class="bargraph-title"> </div>' +
+            '<div id="bargraph-bar-'+me.block.idx+'" class="bargraph-bar"></div>' +
+            '<div id="bargraph-value-'+me.block.idx+'" class="bargraph-value"></div>' +
             '</div>';
     }
 
     function drawCard(me) {
-        var card = document.getElementById('bargraph_' + me.block.idx);
         var device = Domoticz.getAllDevices(me.block.idx);
-        console.log(device);
 
-        const iconDiv = document.createElement("div");
-        iconDiv.setAttribute("class", "fas fa-bolt bargraph-icon");
-        card.appendChild(iconDiv);
+        var element = document.getElementById('bargraph-title-' + me.block.idx);
+        var newText = document.createTextNode(device.Name);
+        element.appendChild(newText);        
 
-        const titleDiv = document.createElement("div");
-        titleDiv.setAttribute("class", "bargraph-title");
-        titleDiv.appendChild(document.createTextNode(device.Name));
-        card.appendChild(titleDiv);
-
-        const barDiv = document.createElement("div");
-        barDiv.setAttribute("class", "bargraph-bar");
-
-        for (let i = 1; i < 10; i++) {
-            const newDiv = document.createElement("div");
-            //newDiv.setAttribute("width", card.clientWidth);
+        var element = document.getElementById('bargraph-bar-' + me.block.idx);
+        for (let i = 1; i < (me.block.numSegments+1); i++) {
+            const newDiv = document.createElement("div");            
             newDiv.setAttribute("class", "bar-segment-" + me.block.idx + " level-" + i);
-            barDiv.appendChild(newDiv);
-        }
+            element.appendChild(newDiv);
+        }        
 
-        card.appendChild(barDiv);
-
-        const valueDiv = document.createElement("div");
-        valueDiv.setAttribute("id", "bargraph-value-" + me.block.idx);
-        valueDiv.setAttribute("class", "bargraph-value");
-        const newText = document.createTextNode(device.Usage);
-        valueDiv.appendChild(newText);
-
-        card.appendChild(valueDiv);
+        var element = document.getElementById('bargraph-value-' + me.block.idx);
+        newText = document.createTextNode(device.Usage);
+        element.appendChild(newText);        
     }
 
     function getColor(level) {
@@ -68,6 +56,7 @@ var DT_bargraph = (function () {
             height: 300,
             type: 'bargraph',
             title: 'Bargraph',
+            iconName: 'fas fa-bolt',
 
         },
         run: function (me) {

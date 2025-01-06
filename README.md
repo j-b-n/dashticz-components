@@ -13,6 +13,8 @@ I decided to create them mainly because I wanted to learn more Javascript and to
 
 - Bargraph
 
+![Image](assets/bargraph.png)
+
 ### Prerequisites
 - [Domoticz](https://github.com/domoticz/domoticz)
 - [Dashticz](https://dashticz.readthedocs.io/en/master/)

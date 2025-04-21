@@ -1,0 +1,45 @@
+.block_clockcard_left {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-columns: repeat(4fr, 4fr);
+    grid-template-areas: "clockcard_clock clockcard_date";
+    align-items: center;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 0.5em;
+    
+}
+
+.block_clockcard_right {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-columns: repeat(4fr, 4fr);
+    grid-template-areas: "clockcard_date clockcard_clock";
+    align-items: center;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 0.5em;    
+}
+
+.clock-container {
+    grid-area: clockcard_clock;
+    background: rgba(0, 0, 0, 0.2);
+    background-color: #1a1a1a;
+
+    text-align: center;
+    margin-left: 0.2em;
+    border-radius: 0.1em;
+    padding: 0.2em 0;
+    font-size: 3.0em;
+}
+
+.date-container {
+    grid-area: clockcard_date;
+    padding: 1em 0;
+    text-align: center;
+    border-radius: 0.5em;
+    font-size: 200%;
+}
+
+[class*="block_clockcard"] .sunrise, [class*="block_clockcard"] .sunset, [class*="block_clockcard"] .wi {
+  font-size: 10px !important;
+}
+

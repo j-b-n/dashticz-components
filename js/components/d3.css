@@ -1,0 +1,11 @@
+.chart-wrapper {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.graph-svg-component {
+    background-color: rgba(0,0,0,0.5);
+}

@@ -18,18 +18,18 @@ var DT_bargraph = (function () {
 
         var element = document.getElementById('bargraph-title-' + me.block.idx);
         var newText = document.createTextNode(device.Name);
-        element.appendChild(newText);        
+        element.appendChild(newText);
 
         var element = document.getElementById('bargraph-bar-' + me.block.idx);
         for (let i = 1; i < (me.block.numSegments+1); i++) {
-            const newDiv = document.createElement("div");            
+            const newDiv = document.createElement("div");
             newDiv.setAttribute("class", "bar-segment-" + me.block.idx + " level-" + i);
             element.appendChild(newDiv);
-        }        
+        }
 
         var element = document.getElementById('bargraph-value-' + me.block.idx);
         newText = document.createTextNode(device.Usage);
-        element.appendChild(newText);        
+        element.appendChild(newText);
     }
 
     function getColor(level) {
@@ -49,7 +49,7 @@ var DT_bargraph = (function () {
         canHandle: function (block) {
             return block && block.type && block.type === 'bargraph';
         },
-        defaultCfg: { 
+        defaultCfg: {
             width: 6,
             numSegments: 9,
             maxPower: 5000,

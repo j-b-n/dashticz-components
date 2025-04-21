@@ -9,11 +9,9 @@ This repro is a collection of Dashticz components I have created for my own use 
 
 I decided to create them mainly because I wanted to learn more Javascript and to add new features to my Dashticz dashboard.
 
-### Components
+### Documentation
+Documentation is located in the [wiki](https://github.com/j-b-n/dashticz-components/wiki)! 
 
-- Bargraph
-
-![Image](assets/bargraph.png)
 
 ### Prerequisites
 - [Domoticz](https://github.com/domoticz/domoticz)

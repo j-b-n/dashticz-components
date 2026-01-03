@@ -29,6 +29,13 @@ Update the components with a new release.
 Download the latest release
 ````
 
+### Dashticz modifications
+
+To simplyfy the loading of custom components the main dashticz loader must be modified. See and use the **dashticz-mod/dashticz.js** file. 
+
+And the web server must allow directory listing for components. For example:
+In Apache, add Options +Indexes to the .htaccess or server config for that directory.
+
 **Author**
 
 * [j-b-n](https://github.com/j-b-n)

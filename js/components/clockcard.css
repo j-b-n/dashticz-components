@@ -22,7 +22,8 @@
 .clock-container {
     grid-area: clockcard_clock;
     background: rgba(0, 0, 0, 0.2);
-    background-color: #1a1a1a;
+ /* background-color: #1a1a1a; */
+    background-color: transparent;
 
     text-align: center;
     margin-left: 0.2em;

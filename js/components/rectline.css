@@ -1,0 +1,85 @@
+.rectline {
+    font-size: 16px;
+    margin: 0 auto;
+}
+
+.rectline .light {
+    font-size: 0.9em;
+    color: #666666;
+}
+
+.rectline .label {
+    float: right;
+}
+
+.rectline svg {
+    padding-top: 5px;
+    width: 100%;
+}
+
+.rectline svg rect.blue {
+    fill: #1B85AC;
+}
+
+
+.rectline svg rect.lightblue {
+        fill: #18C2FF;
+    }
+
+.rectline svg rect.yellow {
+    fill: #ffcc66;
+}
+
+.rectline svg rect.red {
+    fill: #ff5566;
+}
+
+.rectline svg rect:hover {
+    background-color: #44aaaa;
+    color: #44aaaa;
+}
+
+.rectline .legend {
+    display: flex;
+    justify-content: space-between;
+}
+
+.rectline svg rect.rectlinebelow {
+    opacity: 1;
+}
+
+.rectline svg rect.rectlineon {
+    stroke: #FFFFFF;
+    fill: #FFFFFF;
+}
+
+.rectline svg rect.rectlineabove {
+    opacity: 0.2    
+}
+
+
+.tooltip {
+    visibility: hidden;
+    position: absolute;
+    font-size: 12px;
+    min-width: 20%;
+    transform: translateX(-50%);
+    margin-top: 20px;
+    padding: 10px;
+    color: #666666;
+    background-color: #eeeeee;
+    border-radius: 3px;
+    box-sizing: border-box;
+    box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.5);
+    z-index: 2;
+}
+
+.tooltip::after {
+    content: "!!";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    border: 8px solid #eeeeee;
+    transform: translate(-50%, 50%) rotate(135deg);
+    box-shadow: -1px 1px 1px 0px rgba(0, 0, 0, 0.5);
+}

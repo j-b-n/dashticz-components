@@ -1,15 +1,23 @@
-var DT_ha_gauge = (function () {
-    var gauge;
+/*
+    Inspired by https://github.com/home-assistant/frontend/blob/dev/src/components/ha-gauge.ts
+*/
 
-	function getColor(value, min, max)
+var DT_ha_gauge = (function () {
+
+	function getColor(value, me)
 	{	
+		if (typeof me.block.SolidColor !== 'undefined') {
+			return me.block.SolidColor
+		}
+	
 		var color = "white";
-		if (value < min) {
-			color = "green";
-		} else if (value > max) {
-			color = "red";
-		} else {
-			color = "yellow";
+		if (typeof me.block.SolidColors !== 'undefined') {
+			var percent = value / me.block.max * 100;
+			me.block.SolidColors.forEach( (element) => {			
+			 	if(element[0] <= percent) {
+					color = element[1];
+			 	}
+			});
 		}
 		return color;
 	}
@@ -33,41 +41,33 @@ var DT_ha_gauge = (function () {
 		var percent = 0;
 		var angle = 0;
 
+		var decimals = 0;
+		if (typeof me.block.decimals !== 'undefined') {
+			decimals = parseInt(me.block.decimals);
+		}
+
 		//console.log(device);
 
-		if(device.SubType == "Energy") {
-			value = parseFloat(device.Usage).toFixed(0);
-			percent = value / me.block.max * 100;
-			//console.log("Percent: "+percent);
-			angle = 180 * (percent / 100);
-			//console.log("Angle: "+angle);
-			if (angle > 180) {
-				angle = 180;
-			}
-			if (angle < 0) {
-				angle = 0;
-			}
+		switch (device.SubType) {
+			case "Custom":
+			case "Electric":
+				value = parseFloat(device.Data).toFixed(decimals);
+				break;
+			case "Temp + Humidity":
+				value = parseFloat(device.Temp).toFixed(decimals);
+				break;
+			case "Energy":
+				value = parseFloat(device.Usage).toFixed(decimals);
+				break;
+		}	
 
-			//color = getColor(value, 1000, 2000);
-		}
-	
-		if(device.SubType == "Electric") {
-			value = parseFloat(device.Data).toFixed(0);
-			percent = value / me.block.max * 100;
-			//console.log("Percent: "+percent);
-			angle = 180 * (percent / 100);
-			//console.log("Angle: "+angle);
-			if (angle > 180) {
-				angle = 180;
-			}
-			if (angle < 0) {
-				angle = 0;
-			}
+		percent = value / me.block.max * 100;
+		angle = 180 * (percent / 100);
+		angle = angle > 180 ? 180 : angle;
+		angle = angle < 0 ? 0 : angle;
 
-			//color = getColor(value, 1000, 2000);
-		}
-
-		html = '<svg viewBox="-50 -50 100 50" class="gauge">';
+		html = '<svg viewBox="-50 -50 100 80" class="gauge" xmlns="http://www.w3.org/2000/svg">';
+		//html = '<svg height="100%" width="100%" class="gauge" style="background-color:brown">';
 
 		if(me.block.GradientColors) {
 			html += '<defs>';
@@ -75,7 +75,7 @@ var DT_ha_gauge = (function () {
 			html += '</defs>';
 			color = "url(#gradient)";
 		} else {
-			color = "white";
+			color = getColor(value, me);
 		}
 
 		html += '<path d="M -40 0 A 40 40 0 0 1 40 0" style="fill:none;stroke:'+color+';stroke-width:10" />'
@@ -83,14 +83,6 @@ var DT_ha_gauge = (function () {
 		var cos = 0 - 40 * Math.cos((angle * Math.PI) / 180);
 		var sin = 0 - 40 * Math.sin((angle * Math.PI) / 180);
 		html += '<path class="level" d="M '+cos+' '+sin+' A 40 40 0 0 1 40 0" style="fill:none;stroke:gray;stroke-width:10" />';
-
-
-		//Needle
-
-		if(me.block.needle) {
-			color = me.block.needleColor;
-			html += '<path class="needle" d="M -25 -2.5 L -47.5 0 L -25 2.5 z" transform="rotate('+angle+')" style="fill:'+color+';stroke:none" />';
-		}
 
 		/*
 		var cos = 0 - 40 * Math.cos((180 * Math.PI) / 180);
@@ -100,21 +92,39 @@ var DT_ha_gauge = (function () {
 
 		if (typeof me.block.segments !== 'undefined') {
 			me.block.segments.forEach( (element) => {
-				angle = element[0];
-				cos = 0 - 40 * Math.cos((angle * Math.PI) / 180);
-				sin = 0 - 40 * Math.sin((angle * Math.PI) / 180);
+				var segmentangle = 180 * (element[0] / 100);
+				cos = 0 - 40 * Math.cos((segmentangle * Math.PI) / 180);
+				sin = 0 - 40 * Math.sin((segmentangle * Math.PI) / 180);
 				html += '<path class="level" d="M '+cos+' '+sin+' A 40 40 0 0 1 40 0" style="fill:none;stroke:'+element[1]+';stroke-width:10" />';
 
 			});
 		};
 
-		color  =  me.block.textColor ? me.block.textColor: "white";
-		html += '<text class="value-text" x="0" y="-5" text-anchor="middle" dominant-baseline="middle" font-size="20px" fill="'+color+'">';
+		//Needle
+
+		if(me.block.needle) {
+			color = me.block.needleColor;
+			html += '<path class="needle" d="M -25 -2.5 L -47.5 0 L -25 2.5 z" transform="rotate('+angle+')" style="fill:'+color+';stroke:none" />';
+		}
+
+		color =  me.block.textColor ? me.block.textColor: "white";
+		html += '<text class="value-text" x="0" y="-5" text-anchor="middle" dominant-baseline="middle" font-size="10px" fill="'+color+'">';
 		html += value;
+		if (typeof me.block.Unit !== 'undefined') {
+			html += ' '+me.block.Unit;
+		}
 		html += '</text>';
+
+		html += '<text class="label-text" x="0" y="10" text-anchor="middle" dominant-baseline="middle" font-size="7px" fill="'+color+'">';
+		if (typeof me.block.title !== 'undefined') {
+			html += me.block.title;
+		} else {
+			html += device.Name;
+		}
+		html += '</text>';
+
 		html += '</svg>';
         return html;
-
     }
 
     return {
@@ -122,9 +132,9 @@ var DT_ha_gauge = (function () {
         init: function () {
 			return DT_function.loadCSS('./js/components/ha-gauge.css');
         },
-        defaultCfg: { //All optional. defaultCfg can also be a function and then will receive block as parameter.
-			title: '',
-            //	icon: 'fas fa-robot', // string to define the default icon
+        defaultCfg: { 
+			//title: '',
+            //icon: 'fas fa-robot', 
 			show_lastupdate: false,
 			idx: 1,
 			min: 0,
@@ -141,20 +151,33 @@ var DT_ha_gauge = (function () {
 
 			me.block.height = parseInt(height);
 
-			console.log(me.block);
-
-			Dashticz.subscribeDevice(me, me.block.idx, true, function (device) {
-				this.value = device.Data;
-
-				//console.log(device);
-
+			if(me.block.demo == true) {
+				me.block.segments =  [["0", "green"], ["33", "yellow"],["67","red"]]
+				me.block.needle = true;
+				me.block.needleColor = "white";
+				//me.block.GradientColors =  [["0", "green"], ["40", "yellow"],["60","yellow"], ["100", "red"]];
+				/*
+				me.block.SolidColors =  [["0", "#ffffff"], ["10", "#ffe6e6"],["20","#ff9999"], ["30","#ff6666"], 
+										 ["40", "#ff3333"], ["50", "#ff0000"], ["60", "#cc0000"], ["70", "#990000"],
+										 ["80", "#660000"], ["90", "#330000"], ["100", "#000000"]];
+										 */
+				//me.block.SolidColor = "green";
+				device = {					
+					"Data": me.block.demoValue,
+					"Type": "Custom",
+					"idx": 1
+				};
 				$(me.mountPoint + ' .dt_content').html(buildHTML(me, device));
-			});
-			
-
+			} 
+			else 
+			{
+				Dashticz.subscribeDevice(me, me.block.idx, true, function (device) {
+					this.value = device.Data;
+					$(me.mountPoint + ' .dt_content').html(buildHTML(me, device));
+				});
+			}
         },
-
     }
 })();
 
-Dashticz.register(DT_ha_gauge); //Don't forget to register the block
+Dashticz.register(DT_ha_gauge);

@@ -345,7 +345,6 @@ var DT_d3 = (function () {
 	        var yScale = d3.scaleLinear().domain([0, maxY]).range([height, 0]);
 	    //yScale.domain([d3.min(lineData,d=>d[1]),d3.max(lineData, d=>[1] )]);
 
-
 	        var arr = d3.extent(lineData, d => d[1]);
 	        if(arr.length == 2) {
 		    arr[0] = arr[0]-1;
@@ -354,6 +353,7 @@ var DT_d3 = (function () {
 	    
 		yScale.domain(arr);
 
+		var fillColor = d3.select(".graph-svg-component").style("background-color");
 
 		svg.append("svg:rect")
 			.attr("rx", 3)
@@ -364,7 +364,8 @@ var DT_d3 = (function () {
 			.attr("width", width - 2)
 			.attr("height", height - 2)
 			//.style("fill", "#FFFFFF");
-			.style("fill", "#000000");
+			//.style("fill", "#000000");
+			.style("fill", fillColor);
 
 
 		var area = d3.area()

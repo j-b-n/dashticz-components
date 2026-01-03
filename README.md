@@ -5,15 +5,13 @@
 ### Description
 This code only works woth Dashticz, a dashboard solution for [Domoticz](https://github.com/domoticz/domoticz). Dashticz is created and maintained by @lokonli and can be found here https://github.com/Dashticz/dashticz.
 
-This repro is a collection of Dashticz components I have created for my own use and I provide them as is without any guaranties for maintance. Perhaps you can find something useful.
+This repro is a collection of Dashticz components I have created for my own use and I provide them as is without any guaranties for maintance or functionality. Perhaps you can find something useful.
 
 I decided to create them mainly because I wanted to learn more Javascript and to add new features to my Dashticz dashboard.
 
-### Components
+### Documentation
+Documentation is located in the [wiki](https://github.com/j-b-n/dashticz-components/wiki)! 
 
-- Bargraph
-
-![Image](assets/bargraph.png)
 
 ### Prerequisites
 - [Domoticz](https://github.com/domoticz/domoticz)

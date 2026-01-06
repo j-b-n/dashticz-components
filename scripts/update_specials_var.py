@@ -6,6 +6,7 @@ from os.path import isfile, join, dirname, basename
 from dotenv import load_dotenv
 import shutil
 from datetime import datetime
+import os
 
 load_dotenv()
 
@@ -16,6 +17,9 @@ parser.add_argument('--force', action='store_true', help='Replace the original f
 args = parser.parse_args()
 
 sourcepath = getenv('DASHTICZ_COMPONENTS_SOURCE_PATH', '/home/pi/dashticz-components/js/components/')
+if not os.path.isdir(sourcepath):
+    print(f"Error: Source path {sourcepath} does not exist or is not a directory.")
+    exit(1)
 current_date = datetime.now().strftime('%Y%m%d')
 
 # Get list of .js files in sourcepath

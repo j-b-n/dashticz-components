@@ -10,13 +10,15 @@ if [ -f "$ENV_FILE" ]; then
 fi
 
 echo "Starting Dashticz components synchronization..."
-echo "Using path: ${DASHTICZ_COMPONENTS_PATH}"
+echo "Using source path: ${DASHTICZ_COMPONENTS_SOURCE_PATH}"
+echo "Using target path: ${DASHTICZ_COMPONENTS_PATH}"
 
-# Default path if not set
+# Default paths if not set
+DASHTICZ_COMPONENTS_SOURCE_PATH=${DASHTICZ_COMPONENTS_SOURCE_PATH:-/home/pi/dashticz-components/js/components/}
 DASHTICZ_COMPONENTS_PATH=${DASHTICZ_COMPONENTS_PATH:-/opt/stacks/dashticz/dashticz/js/components/}
 
 # Sync components using rsync
-rsync -auvh --chown=${WWW_USER_ID}:${WWW_GROUP_ID} ./js/components/ "$DASHTICZ_COMPONENTS_PATH"
+rsync -auvh --chown=${WWW_USER_ID}:${WWW_GROUP_ID} "$DASHTICZ_COMPONENTS_SOURCE_PATH" "$DASHTICZ_COMPONENTS_PATH"
 echo "Dashticz components synchronized to $DASHTICZ_COMPONENTS_PATH"
 echo "User ID: ${WWW_USER_ID}, Group ID: ${WWW_GROUP_ID}"
 exit 0

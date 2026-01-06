@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser(description='Create symlinks for Dashticz compo
 parser.add_argument('--debug', action='store_true', help='Print what would happen instead of performing actions.')
 args = parser.parse_args()
 
-sourcepath = "/home/pi/dashticz-components/js/components/"
+sourcepath = getenv('DASHTICZ_COMPONENTS_SOURCE_PATH', '/home/pi/dashticz-components/js/components/')
 targetpath = getenv('DASHTICZ_COMPONENTS_PATH', '/opt/stacks/dashticz/dashticz/js/components/')
 
 files = [f for f in listdir(sourcepath) if isfile(join(sourcepath, f)) and (f[-3:] == ".js" or f[-4:] == ".css")]

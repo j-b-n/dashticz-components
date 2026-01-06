@@ -5,7 +5,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Environment variables
-.env
+.env*
 
 # Build outputs
 dist/
@@ -16,6 +16,7 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+.venv/
 
 # Logs
 *.log

@@ -1,0 +1,31 @@
+.waterflow {
+  background-color: transparent;
+  --waterflow-cold-light: lightblue;
+  --waterflow-cold-dark: aqua;
+  --waterflow-hot-light: lightcoral;
+  --waterflow-hot-dark: red;
+}
+
+.waterflow-fill-cold {
+  fill: url(#coldGradient);
+}
+
+.waterflow-fill-hot {
+  fill: url(#hotGradient);
+}
+
+.waterflow-value-text {
+  font-weight: bold;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  font-size: 10px;
+  fill: whitesmoke;
+}
+
+.waterflow-label-text {
+  font-weight: bold;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  font-size: 7px;
+  fill: whitesmoke;
+}

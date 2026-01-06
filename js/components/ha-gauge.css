@@ -1,0 +1,33 @@
+.ha-gauge {
+  background-color: transparent;
+}
+
+.ha-gauge-arc-background {
+  fill: none;
+  stroke: darkgrey;
+  stroke-width: 10;
+}
+
+.ha-gauge-needle {
+  stroke: crimson;
+  fill: crimson;
+  stroke-width: 2;
+}
+
+.ha-gauge-value-text {
+  font-weight: bold;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  font-size: 10px;
+  fill: whitesmoke
+}
+
+.ha-gauge-label-text {
+  font-weight: bold;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  font-size: 7px;
+  fill: whitesmoke;
+}
+
+/* fill:none;stroke:slateblue;stroke-width:10 */

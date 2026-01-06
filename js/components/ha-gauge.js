@@ -65,9 +65,8 @@ var DT_ha_gauge = (function () {
 		angle = 180 * (percent / 100);
 		angle = angle > 180 ? 180 : angle;
 		angle = angle < 0 ? 0 : angle;
-
-		html = '<svg viewBox="-50 -50 100 80" class="gauge" xmlns="http://www.w3.org/2000/svg">';
-		//html = '<svg height="100%" width="100%" class="gauge" style="background-color:brown">';
+		
+		html = '<svg viewBox="-50 -50 100 80" class="ha-gauge" xmlns="http://www.w3.org/2000/svg">';
 
 		if(me.block.GradientColors) {
 			html += '<defs>';
@@ -82,7 +81,7 @@ var DT_ha_gauge = (function () {
 
 		var cos = 0 - 40 * Math.cos((angle * Math.PI) / 180);
 		var sin = 0 - 40 * Math.sin((angle * Math.PI) / 180);
-		html += '<path class="level" d="M '+cos+' '+sin+' A 40 40 0 0 1 40 0" style="fill:none;stroke:gray;stroke-width:10" />';
+		html += '<path class="ha-gauge-arc-background" d="M '+cos+' '+sin+' A 40 40 0 0 1 40 0" />';
 
 		/*
 		var cos = 0 - 40 * Math.cos((180 * Math.PI) / 180);
@@ -104,18 +103,22 @@ var DT_ha_gauge = (function () {
 
 		if(me.block.needle) {
 			color = me.block.needleColor;
-			html += '<path class="needle" d="M -25 -2.5 L -47.5 0 L -25 2.5 z" transform="rotate('+angle+')" style="fill:'+color+';stroke:none" />';
+			html += '<path class="ha-gauge-needle" d="M -25 -2.5 L -47.5 0 L -25 2.5 z" transform="rotate('+angle+')" style="fill:'+color+';stroke:none" />';
 		}
 
 		color =  me.block.textColor ? me.block.textColor: "white";
-		html += '<text class="value-text" x="0" y="-5" text-anchor="middle" dominant-baseline="middle" font-size="10px" fill="'+color+'">';
+		html += '<text class="ha-gauge-value-text" x="0" y="-5" text-anchor="middle" dominant-baseline="middle" font-size="10px" fill="'+color+'">';
 		html += value;
 		if (typeof me.block.Unit !== 'undefined') {
 			html += ' '+me.block.Unit;
 		}
 		html += '</text>';
 
-		html += '<text class="label-text" x="0" y="10" text-anchor="middle" dominant-baseline="middle" font-size="7px" fill="'+color+'">';
+		//html += '<text class="label-text" x="0" y="10" text-anchor="middle" dominant-baseline="middle" font-size="7px" fill="'+color+'">';
+		html +=
+      '<text class="ha-gauge-label-text" x="0" y="10" text-anchor="middle" dominant-baseline="middle" font-size="7px" fill="' +
+      color +
+      '">';
 		if (typeof me.block.title !== 'undefined') {
 			html += me.block.title;
 		} else {
@@ -164,7 +167,7 @@ var DT_ha_gauge = (function () {
 				//me.block.SolidColor = "green";
 				device = {					
 					"Data": me.block.demoValue,
-					"Type": "Custom",
+					"SubType": "Custom",
 					"idx": 1
 				};
 				$(me.mountPoint + ' .dt_content').html(buildHTML(me, device));

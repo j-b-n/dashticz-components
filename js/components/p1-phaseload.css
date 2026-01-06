@@ -1,0 +1,26 @@
+.p1-phaseload {
+    background-color: transparent;
+}
+.p1-phaseload-container {
+  width: 100%;
+  text-align: center;
+  background-color: transparent;
+}
+
+.p1-phaseload-current {
+  font-weight: bold;
+  text-anchor: middle;
+  font-size: 8px;
+  fill: whitesmoke;
+}
+
+.p1-phaseload-voltage {
+  font-weight: bold;
+  text-anchor: middle;
+  font-size: 8px;
+  fill: whitesmoke;
+}
+
+.p1-phaseload-box-background {
+  fill: darkgray;
+}

@@ -37,6 +37,10 @@ var DT_rectline = (function ()  {
             $(me.mountPoint + ' .dt_content').html(buildHTML(me));
             
             var device = Domoticz.getAllDevices(me.block.idx);
+            if (!device) {
+                console.warn('Rectline component: Device not found (idx: ' + me.block.idx + ')');
+                return;
+            }
             draw_rect(me, device.Temp);
             
             //subscribe to sensor data

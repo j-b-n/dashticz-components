@@ -385,6 +385,10 @@ var DT_circle_gauge = (function () {
         }, 1000);
       } else {
         var device = Domoticz.getAllDevices(me.block.idx);
+        if (!device) {
+          $(me.mountPoint).html('<div class="error">Device not found (idx: ' + me.block.idx + ')</div>');
+          return;
+        }
         $(me.mountPoint + " .dt_content").html(buildHTML(me, device));
         Dashticz.subscribeDevice(me, me.block.idx, true, function (device) {
           this.value = device.Data;

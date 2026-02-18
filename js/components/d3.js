@@ -38,6 +38,10 @@ var DT_d3 = (function () {
 		me.block.width = parseInt(width);
 
 		var device = Domoticz.getAllDevices(me.block.idx);
+		if (!device) {
+			console.warn('D3 component: Device not found (idx: ' + me.block.idx + ')');
+			return;
+		}
 		$.extend(device, Domoticz.getAllDevices(me.block.idx)); //Make a copy of the current device data
 
 		me.graphDevice = device;

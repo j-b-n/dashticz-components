@@ -36,15 +36,31 @@ var DT_p1_phaseload = (function () {
       return "red";
     }
 
-    var l1_voltage =
-      parseInt(Domoticz.getAllDevices(me.block.l1_voltage_idx).Data) /
-      me.block.voltage_divider; // L1 Voltage
-    var l2_voltage =
-      parseInt(Domoticz.getAllDevices(me.block.l2_voltage_idx).Data) /
-      me.block.voltage_divider; // L2 Voltage
-    var l3_voltage =
-      parseInt(Domoticz.getAllDevices(me.block.l3_voltage_idx).Data) /
-      me.block.voltage_divider; // L3 Voltage
+    var l1_voltage = 0;
+    var l2_voltage = 0;
+    var l3_voltage = 0;
+
+    // Validate voltage device indices exist and devices are available
+    if (me.block.l1_voltage_idx) {
+      const l1Device = Domoticz.getAllDevices(me.block.l1_voltage_idx);
+      if (l1Device && l1Device.Data) {
+        l1_voltage = parseInt(l1Device.Data) / me.block.voltage_divider;
+      }
+    }
+
+    if (me.block.l2_voltage_idx) {
+      const l2Device = Domoticz.getAllDevices(me.block.l2_voltage_idx);
+      if (l2Device && l2Device.Data) {
+        l2_voltage = parseInt(l2Device.Data) / me.block.voltage_divider;
+      }
+    }
+
+    if (me.block.l3_voltage_idx) {
+      const l3Device = Domoticz.getAllDevices(me.block.l3_voltage_idx);
+      if (l3Device && l3Device.Data) {
+        l3_voltage = parseInt(l3Device.Data) / me.block.voltage_divider;
+      }
+    }
 
     var voltage = [
       l1_voltage.toFixed(decimals),

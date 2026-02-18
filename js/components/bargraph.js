@@ -16,6 +16,14 @@ var DT_bargraph = (function () {
     function drawCard(me) {
         var device = Domoticz.getAllDevices(me.block.idx);
 
+        // Validate device exists
+        if (!device) {
+            var element = document.getElementById('bargraph-title-' + me.block.idx);
+            var newText = document.createTextNode('Device not found');
+            element.appendChild(newText);
+            return;
+        }
+
         var element = document.getElementById('bargraph-title-' + me.block.idx);
         var newText = document.createTextNode(device.Name);
         element.appendChild(newText);

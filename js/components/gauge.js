@@ -104,7 +104,6 @@ var DT_gauge = (function () {
         init: function () {
 			DT_function.loadCSS('./js/components/gauge.css');
 			return DT_function.loadScript('//cdn.rawgit.com/Mikhus/canvas-gauges/gh-pages/download/2.1.7/all/gauge.min.js');
-			return DT_function.loadCSS('./js/components/gauge.css');
         },
         defaultCfg: { //All optional. defaultCfg can also be a function and then will receive block as parameter.
 			title: '',
@@ -120,6 +119,13 @@ var DT_gauge = (function () {
 	    //For basic usage you will add additional code to $(me.mountPoint + ' .dt_state')
 	    //me.block: Reference to the block definition in CONFIG.js
 
+	    // Validate device exists
+	    const device = Domoticz.getAllDevices(me.block.idx);
+	    if (!device) {
+	        $(me.mountPoint).html('<div class="error">Device not found (idx: ' + me.block.idx + ')</div>');
+	        return;
+	    }
+
 	    me.layout = parseInt(0+me.block.layout);
 	    var height = isDefined(me.block.height)
                 ? parseInt(me.block.height)
@@ -127,7 +133,7 @@ var DT_gauge = (function () {
 
 	    me.block.height = parseInt(height);
 
-	    var temp = Domoticz.getAllDevices(me.block.idx).Temp;
+	    var temp = device.Temp;
 	    console.log("Gauge temp:"+temp);
 
 	    console.log("Gauge layout:"+me.layout);

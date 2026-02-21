@@ -18,9 +18,9 @@ var DT_go2rtc = {
         
         const streamUrl = go2rtcUrl + '/webrtc.html?src=' + encodeURIComponent(streamName) + '&media=video';
         
-        return '<div data-id="go2rtc" class="block_go2rtc col-xs-' +
+        return '<div data-id="go2rtc" class="col-xs-' +
             me.block.width +
-            ' dt_block">'+
+            ' block_go2rtc dt_block">'+
             (title ? '<div class="go2rtc-title">' + title + '</div>' : '') +
             '<div class="go2rtc-wrapper">'+
             '<iframe id="' + iframeId + '" class="go2rtc-iframe" src="' + streamUrl + '" frameborder="0" scrolling="no" allow="autoplay; microphone; camera" allowfullscreen></iframe>'+
@@ -36,8 +36,8 @@ var DT_go2rtc = {
         return block && block.type && block.type === 'go2rtc';
     },    
     defaultCfg: {
-        width: 4,
-        height: 400,
+        width: 12,
+        height: 300,
         title: '',
         go2rtcUrl: 'http://10.0.0.100:1984',
         streamName: 'nest1',
@@ -46,9 +46,11 @@ var DT_go2rtc = {
         $(me.mountPoint).html(this.buildVideoHTML(me));
         
         const height = me.block.height || 400;
-        const titleHeight = $(me.mountPoint + ' .go2rtc-title').outerHeight(true);
-        const wrapperHeight = height - titleHeight - 10; // 10px for padding/margin
+        const titleElement = $(me.mountPoint + ' .go2rtc-title');
+        const titleHeight = titleElement.length > 0 ? titleElement.outerHeight(true) : 0;
+        const wrapperHeight = height - titleHeight;
         $(me.mountPoint + ' .go2rtc-wrapper').css('height', wrapperHeight + 'px');
+        console.log('Set go2rtc wrapper height to ' + wrapperHeight + 'px');
     },    
 }
 

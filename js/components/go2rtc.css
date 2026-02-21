@@ -1,5 +1,5 @@
 .block_go2rtc {
-    background: rgba(0, 0, 0, 0.3);
+    background: lightslategray;
     border-radius: 0.5em;
     padding: 0.5em;
     display: flex;
@@ -50,20 +50,4 @@
     font-size: 0.9em;
     max-width: 90%;
     z-index: 10;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .block_go2rtc {
-        padding: 0.3em;
-    }
-    
-    .go2rtc-title {
-        font-size: 0.9em;
-        margin-bottom: 0.3em;
-    }
-    
-    .go2rtc-iframe {
-        max-height: 50vh;
-    }
 }

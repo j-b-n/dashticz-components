@@ -10,7 +10,7 @@ var DT_go2rtc = {
         if (!streamName) {
             return '<div data-id="go2rtc" class="block_go2rtc col-xs-' +
                 me.block.width +
-                '">'+
+                ' camera dt_block">'+
                 (title ? '<div class="go2rtc-title">' + title + '</div>' : '') +
                 '<div class="go2rtc-error">Stream name not configured</div>'+
                 '</div>';
@@ -20,7 +20,7 @@ var DT_go2rtc = {
         
         return '<div data-id="go2rtc" class="block_go2rtc col-xs-' +
             me.block.width +
-            '">'+
+            ' dt_block">'+
             (title ? '<div class="go2rtc-title">' + title + '</div>' : '') +
             '<div class="go2rtc-wrapper">'+
             '<iframe id="' + iframeId + '" class="go2rtc-iframe" src="' + streamUrl + '" frameborder="0" scrolling="no" allow="autoplay; microphone; camera" allowfullscreen></iframe>'+
@@ -36,8 +36,8 @@ var DT_go2rtc = {
         return block && block.type && block.type === 'go2rtc';
     },    
     defaultCfg: {
-        width: 8,
-        height: 600,
+        width: 4,
+        height: 400,
         title: '',
         go2rtcUrl: 'http://10.0.0.100:1984',
         streamName: 'nest1',

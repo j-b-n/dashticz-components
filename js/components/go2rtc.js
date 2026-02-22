@@ -187,7 +187,8 @@ var DT_go2rtc = {
     title: "",
     go2rtcUrl: "",
     streamName: "",
-    go2rtcType: "webrtc", // or "webrtc" (requires video transceiver support)
+    go2rtcType: "iframe", // or "webrtc" (requires video transceiver support)
+    aspectRatio: "16 / 9", // Customize for different camera aspect ratios (e.g., "4 / 3")
   },
   run: function (me) {
     const go2rtcType = me.block.go2rtcType || "iframe";
@@ -205,7 +206,13 @@ var DT_go2rtc = {
     const titleHeight =
       titleElement.length > 0 ? titleElement.outerHeight(true) : 0;
     const wrapperHeight = height - titleHeight;
-    $(me.mountPoint + " .go2rtc-wrapper").css("height", wrapperHeight + "px");
+    
+    const wrapper = $(me.mountPoint + " .go2rtc-wrapper");
+    wrapper.css("height", wrapperHeight + "px");
+    
+    // Apply aspect ratio if configured
+    const aspectRatio = me.block.aspectRatio || "16 / 9";
+    wrapper.css("aspect-ratio", aspectRatio);
 
     // Connect WebRTC if mode is webrtc
     if (go2rtcType === "webrtc") {

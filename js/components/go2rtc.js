@@ -6,6 +6,7 @@ var DT_go2rtc = {
     const go2rtcUrl = me.block.go2rtcUrl || "http://10.0.0.100:1984";
     const streamName = me.block.streamName || "";
     const iframeId = "go2rtc-iframe-" + me.block.idx;
+    const autoplay = me.block.autoplay !== false; // Default to true
 
     if (!streamName) {
       return (
@@ -18,10 +19,15 @@ var DT_go2rtc = {
       );
     }
 
-    const streamUrl =
+    let streamUrl =
       go2rtcUrl +
       "/stream.html?src=" +
       encodeURIComponent(streamName);
+
+    // Add autoplay parameter to stream URL if enabled
+    if (autoplay) {
+      streamUrl += "&autoplay=1";
+    }
 
     return (
       '<div data-id="go2rtc" class="col-xs-' +
@@ -33,7 +39,7 @@ var DT_go2rtc = {
       iframeId +
       '" class="go2rtc-iframe" src="' +
       streamUrl +
-      '" frameborder="0" scrolling="no" allow="autoplay; microphone; camera" allowfullscreen></iframe>' +
+      '" frameborder="0" scrolling="no" allow="microphone; camera" allowfullscreen></iframe>' +
       "</div>" +
       "</div>"
     );
@@ -64,7 +70,7 @@ var DT_go2rtc = {
       '<div class="go2rtc-wrapper">' +
       '<video id="' +
       videoId +
-      '" class="go2rtc-video" autoplay muted playsinline></video>' +
+      '" class="go2rtc-video" muted playsinline></video>' +
       "</div>" +
       "</div>"
     );
@@ -76,6 +82,7 @@ var DT_go2rtc = {
       const streamName = me.block.streamName || "";
       const idx = me.block.idx || me.block.streamName || "default";
       const videoId = "go2rtc-video-" + idx;
+      const autoplay = me.block.autoplay !== false; // Default to true
 
       if (!streamName) {
         reject(new Error("Stream name not configured"));
@@ -100,6 +107,11 @@ var DT_go2rtc = {
         // Handle remote stream
         pc.ontrack = (event) => {
           videoElement.srcObject = event.streams[0];
+          if (autoplay) {
+            videoElement.play().catch(() => {
+              // Autoplay failed, likely due to browser policy
+            });
+          }
         };
 
         // Handle ICE candidates
@@ -122,6 +134,46 @@ var DT_go2rtc = {
         // Monitor signaling state
         pc.onsignalingstatechange = () => {
           // Signaling state changed
+        };
+
+        // Add visibility change listener to pause/resume video
+        const handleVisibilityChange = () => {
+          if (document.hidden) {
+            videoElement.pause();
+          } else if (videoElement.srcObject && autoplay) {
+            videoElement.play().catch(() => {
+              // Play failed
+            });
+          }
+        };
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+
+        // Add standby mode listener (Dashticz adds/removes 'standby' class on body)
+        const handleStandbyChange = () => {
+          const isStandby = document.body.classList.contains("standby");
+          if (isStandby) {
+            videoElement.pause();
+          } else if (videoElement.srcObject && autoplay) {
+            videoElement.play().catch(() => {
+              // Play failed
+            });
+          }
+        };
+
+        // Use MutationObserver to watch for class changes on body
+        const standbyObserver = new MutationObserver(() => {
+          handleStandbyChange();
+        });
+        standbyObserver.observe(document.body, {
+          attributes: true,
+          attributeFilter: ["class"],
+        });
+
+        // Store handlers for cleanup
+        me.go2rtcData = {
+          pc: pc,
+          visibilityHandler: handleVisibilityChange,
+          standbyObserver: standbyObserver,
         };
 
         // Add video transceiver (CRITICAL: needed for valid SDP offer)
@@ -189,9 +241,23 @@ var DT_go2rtc = {
     streamName: "",
     go2rtcType: "iframe", // or "webrtc" (requires video transceiver support)
     aspectRatio: "16 / 9", // Customize for different camera aspect ratios (e.g., "4 / 3")
+    autoplay: true, // Set to false to prevent autoplay (allows device sleep mode)
   },
   run: function (me) {
     const go2rtcType = me.block.go2rtcType || "iframe";
+
+    // Clean up old event listeners if they exist
+    if (me.go2rtcData) {
+      if (me.go2rtcData.visibilityHandler) {
+        document.removeEventListener("visibilitychange", me.go2rtcData.visibilityHandler);
+      }
+      if (me.go2rtcData.standbyObserver) {
+        me.go2rtcData.standbyObserver.disconnect();
+      }
+      if (me.go2rtcData.iframeStandbyObserver) {
+        me.go2rtcData.iframeStandbyObserver.disconnect();
+      }
+    }
 
     // Select builder based on type
     const html =
@@ -213,6 +279,41 @@ var DT_go2rtc = {
     // Apply aspect ratio if configured
     const aspectRatio = me.block.aspectRatio || "16 / 9";
     wrapper.css("aspect-ratio", aspectRatio);
+
+    // Handle standby mode for iframes (pause stream to allow device sleep)
+    if (go2rtcType === "iframe") {
+      const iframeId = "go2rtc-iframe-" + me.block.idx;
+      const handleIframeStandby = () => {
+        const iframe = document.getElementById(iframeId);
+        if (!iframe) return;
+
+        const isStandby = document.body.classList.contains("standby");
+        if (isStandby) {
+          // Store original src and clear it to pause the stream
+          if (!me.go2rtcData.iframeSrcBackup) {
+            me.go2rtcData.iframeSrcBackup = iframe.src;
+          }
+          iframe.src = "";
+        } else if (me.go2rtcData && me.go2rtcData.iframeSrcBackup) {
+          // Restore the original src
+          iframe.src = me.go2rtcData.iframeSrcBackup;
+        }
+      };
+
+      // Monitor standby class changes for iframe
+      const iframeStandbyObserver = new MutationObserver(() => {
+        handleIframeStandby();
+      });
+      iframeStandbyObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ["class"],
+      });
+
+      if (!me.go2rtcData) {
+        me.go2rtcData = {};
+      }
+      me.go2rtcData.iframeStandbyObserver = iframeStandbyObserver;
+    }
 
     // Connect WebRTC if mode is webrtc
     if (go2rtcType === "webrtc") {

@@ -331,7 +331,6 @@ var DT_d3 = (function () {
 		if (element) element.innerHTML = "";
 
 		d3.select("#SVG-" + me.block.idx).remove();
-		d3.select("#d3-" + me.block.idx).remove();
 
 		//element = document.getElementById('d3-'+me.block.idx);
 
@@ -357,7 +356,7 @@ var DT_d3 = (function () {
 	    
 		yScale.domain(arr);
 
-		var fillColor = d3.select(".graph-svg-component").style("background-color");
+		var fillColor = areaColor || "transparent";
 
 		svg.append("svg:rect")
 			.attr("rx", 3)

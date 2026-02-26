@@ -328,7 +328,8 @@ var DT_d3 = (function () {
 		if (element) element.innerHTML = "";
 
 		element = document.getElementById('d3-' + me.block.idx);
-		if (element) element.innerHTML = "";
+		if (!element) return; // container not in DOM (user navigated away)
+		element.innerHTML = "";
 
 		d3.select("#SVG-" + me.block.idx).remove();
 

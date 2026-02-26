@@ -334,12 +334,16 @@ var DT_d3 = (function () {
 
 		//element = document.getElementById('d3-'+me.block.idx);
 
-		var svg = d3.select(element)
+		var svgRoot = d3.select(element)
 			.append('svg')
 			.attr("id", "SVG-" + me.block.idx)
 			.attr('width', width)
 			.attr('height', height)
-			.attr("class", "graph-svg-component")
+			.attr("class", "graph-svg-component");
+
+		var defs = svgRoot.append("defs");
+
+		var svg = svgRoot
 			.append("g")
 			.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 			;
@@ -356,20 +360,14 @@ var DT_d3 = (function () {
 	    
 		yScale.domain(arr);
 
-		var fillColor = areaColor || "transparent";
-
 		svg.append("svg:rect")
 			.attr("rx", 3)
 			.attr("ry", 3)
 			.attr("x", 1)
 			.attr("y", 1)
-			//.attr("width", '100%')
 			.attr("width", width - 2)
 			.attr("height", height - 2)
-			//.style("fill", "#FFFFFF");
-			//.style("fill", "#000000");
-			.style("fill", fillColor);
-
+			.style("fill", "transparent");
 
 		var area = d3.area()
 			.x(function (d) { return xScale(d[0]); })
@@ -381,8 +379,29 @@ var DT_d3 = (function () {
 			.y(function (d) {
 				return yScale(d[1]);
 			})
-		//.curve(d3.curveMonotoneX)	   
+		//.curve(d3.curveMonotoneX)
 
+		defs.append("linearGradient")
+			.attr("id", me.block.idx + "-area-gradient")
+			.attr("gradientUnits", "userSpaceOnUse")
+			.attr("x1", 0).attr("y1", 0)
+			.attr("x2", 0).attr("y2", height)
+			.selectAll("stop")
+			.data([
+				{ offset: "0%", color: areaColor },
+				{ offset: "60%", color: areaColor },
+				{ offset: "100%", color: "black" }
+			])
+			.enter().append("stop")
+			.attr("offset", function (d) { return d.offset; })
+			.attr("stop-color", function (d) { return d.color; });
+
+		// Draw order: area fill first (below), then stroke line on top
+		svg.append("path")
+			.datum(lineData)
+			.attr("class", "area")
+			.style('fill', "url(#" + me.block.idx + "-area-gradient)")
+			.attr("d", area);
 
 		svg.append("path")
 			.datum(lineData)
@@ -392,31 +411,6 @@ var DT_d3 = (function () {
 			.attr("d", line)
 			.style("stroke", accentColor)
 			.style("stroke-width", "2");
-
-		svg.append("linearGradient")
-			.attr("id", me.block.idx + "-area-gradient")
-			//.attr("gradientUnits", "userSpaceOnUse")
-			.attr("x1", 0).attr("y1", 0)
-			.attr("x2", 0).attr("y2", 1)
-			.selectAll("stop")
-			.data([
-				{ offset: "60%", color: areaColor },
-				{ offset: "100%", color: "black" }
-			])
-			.enter().append("stop")
-			.attr("offset", function (d) { return d.offset; })
-			.attr("stop-color", function (d) { return d.color; });
-
-
-		svg.append("path")
-			.datum(lineData)
-			//	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-			.attr("class", "area")
-			.style('fill', "url(#" + me.block.idx + "-area-gradient)")
-			//.style('fill', areaColor)
-			//.attr("stroke", accentColor)
-			//.attr("stroke-width", 2)
-			.attr("d", area)
 
 
 		//Title of the graph

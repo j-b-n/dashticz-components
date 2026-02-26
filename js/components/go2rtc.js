@@ -3,7 +3,7 @@
 var DT_go2rtc = {
   buildIframeHTML: function (me) {
     const title = me.block.title;
-    const go2rtcUrl = me.block.go2rtcUrl || "http://10.0.0.100:1984";
+    const go2rtcUrl = me.block.go2rtcUrl;
     const streamName = me.block.streamName || "";
     const iframeId = "go2rtc-iframe-" + me.block.idx;
     const autoplay = me.block.autoplay !== false; // Default to true
@@ -78,21 +78,28 @@ var DT_go2rtc = {
 
   connectWebRTC: function (me) {
     return new Promise((resolve, reject) => {
-      const go2rtcUrl = me.block.go2rtcUrl || "http://10.0.0.100:1984";
+      const go2rtcUrl = me.block.go2rtcUrl;
       const streamName = me.block.streamName || "";
       const idx = me.block.idx || me.block.streamName || "default";
       const videoId = "go2rtc-video-" + idx;
       const autoplay = me.block.autoplay !== false; // Default to true
 
+      //console.log("[go2rtc] Connecting WebRTC for stream: " + streamName);
+      //console.log("[go2rtc] Server URL: " + go2rtcUrl);
+
       if (!streamName) {
-        reject(new Error("Stream name not configured"));
+        const error = "Stream name not configured";
+        console.error("[go2rtc] " + error);
+        reject(new Error(error));
         return;
       }
 
       try {
         const videoElement = document.getElementById(videoId);
         if (!videoElement) {
-          reject(new Error("Video element not found"));
+          const error = "Video element not found: " + videoId;
+          console.error("[go2rtc] " + error);
+          reject(new Error(error));
           return;
         }
 
@@ -125,6 +132,7 @@ var DT_go2rtc = {
             pc.connectionState === "failed" ||
             pc.connectionState === "disconnected"
           ) {
+            console.error("[go2rtc] Connection state: " + pc.connectionState);
             reject(
               new Error("WebRTC connection failed: " + pc.connectionState),
             );
@@ -180,7 +188,7 @@ var DT_go2rtc = {
         try {
           pc.addTransceiver("video", { direction: "recvonly" });
         } catch (e) {
-          // Could not add transceiver
+          console.warn("[go2rtc] Failed to add video transceiver: " + e.message);
         }
 
         // Create offer and send via WHEP
@@ -189,21 +197,42 @@ var DT_go2rtc = {
             const offer = await pc.createOffer();
             await pc.setLocalDescription(offer);
 
-            const whepUrl =
-              go2rtcUrl + "/api/webrtc?src=" + encodeURIComponent(streamName);
+            // Try different WHEP endpoint paths
+            const whepPaths = [
+              "api/webrtc?src=" + encodeURIComponent(streamName),
+              "webrtc?src=" + encodeURIComponent(streamName),
+              "publish?src=" + encodeURIComponent(streamName),
+            ];
 
-            const response = await fetch(whepUrl, {
-              method: "POST",
-              body: pc.localDescription.sdp,
-              headers: { "Content-Type": "text/plain" },
-            });
+            let response = null;
+            let workingPath = null;
 
-            if (!response.ok) {
+            for (const path of whepPaths) {
+              // Ensure no double slashes in URL
+              const baseUrl = go2rtcUrl.endsWith('/') ? go2rtcUrl.slice(0, -1) : go2rtcUrl;
+              const whepUrl = baseUrl + "/" + path;
+
+              try {
+                response = await fetch(whepUrl, {
+                  method: "POST",
+                  body: pc.localDescription.sdp,
+                  headers: { "Content-Type": "text/plain" },
+                });
+
+                if (response.ok) {
+                  workingPath = path;
+                  //console.log("[go2rtc] WebRTC connection established for stream: " + streamName);
+                  break;
+                }
+              } catch (e) {
+                // Fetch error, try next endpoint
+              }
+            }
+
+            if (!response || !response.ok) {
               throw new Error(
-                "WHEP response error: " +
-                  response.status +
-                  " " +
-                  response.statusText,
+                "WHEP request failed with status: " +
+                  (response ? response.status : "unknown"),
               );
             }
 
@@ -214,13 +243,14 @@ var DT_go2rtc = {
                 sdp: answerSdp,
               }),
             );
-
             resolve();
           } catch (error) {
+            console.error("[go2rtc] WHEP error: " + error.message);
             reject(error);
           }
         })();
       } catch (error) {
+        console.error("[go2rtc] Unexpected error during WebRTC setup: " + error.message);
         reject(error);
       }
     });
@@ -318,6 +348,9 @@ var DT_go2rtc = {
     // Connect WebRTC if mode is webrtc
     if (go2rtcType === "webrtc") {
       this.connectWebRTC(me).catch((error) => {
+        console.error("[go2rtc] WebRTC connection failed for stream '" + me.block.streamName + "':", error.message);
+        console.error("[go2rtc] URL: " + me.block.go2rtcUrl);
+        console.error("[go2rtc] Falling back to iframe mode");
         me.block.go2rtcType = "iframe";
         this.run(me); // Re-render as iframe
       });

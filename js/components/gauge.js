@@ -1,106 +1,18 @@
 /* Gauge - from https://canvas-gauges.com/ */
 
 var DT_gauge = (function () {
-    var gauge;
 
     function buildHTML(me)
     {
-        html = '<canvas id="'+'gauge-'+me.block.idx+'"></canvas>';
+        var html = '<canvas id="gauge-' + me.block.idx + '"></canvas>';
         return html;
-
-        html = '<b>Value: '+this.value+'</b>';
-        //return html;
-
-        html = '<script src="//cdn.rawgit.com/Mikhus/canvas-gauges/gh-pages/download/2.1.7/all/gauge.min.js"></script>'+
-	    '<canvas data-type="linear-gauge"'+
-	    'width="150" height="400"'+
-            'data-width="150"'+
-            'data-height="400"'+
-            'data-border-radius="20"'+
-            'data-borders="0"'+
-            'data-bar-stroke-width="20"'+
-            'data-minor-ticks="10"'+
-            'data-major-ticks="0,10,20,30,40,50,60,70,80,90,100"'+
-            'data-value="'+this.value+'"'+
-            'data-units="C"'+
-            'data-color-value-box-shadow="false"'+
-	    '></canvas>';
-        return html;
-    }
-
-    function temperature_gauge(me)
-    {
-        gauge = new RadialGauge({
-	renderTo: 'gauge1XX',
-	    width: 200,
-	    height: 200,
-	    units: "°C",
-	    title: "Temperature",
-	    minValue: -50,
-	    maxValue: 50,
-	    majorTicks: [
-	        -50,
-	        -40,
-	        -30,
-	        -20,
-	        -10,
-	        0,
-	        10,
-	        20,
-	        30,
-	        40,
-	        50
-	    ],
-	    minorTicks: 2,
-	    strokeTicks: true,
-	    highlights: [
-	        {
-		    "from": -50,
-		    "to": 0,
-		    "color": "rgba(0,0, 255, .3)"
-	        },
-	        {
-		    "from": 0,
-		    "to": 50,
-		    "color": "rgba(255, 0, 0, .3)"
-	        }
-	    ],
-	    ticksAngle: 225,
-	    startAngle: 67.5,
-	    colorMajorTicks: "#ddd",
-	    colorMinorTicks: "#ddd",
-	    colorTitle: "#eee",
-	    colorUnits: "#ccc",
-	    colorNumbers: "#eee",
-	    colorPlate: "#222",
-	    borderShadowWidth: 0,
-	    borders: true,
-	    needleType: "arrow",
-	    needleWidth: 2,
-	    needleCircleSize: 7,
-	    needleCircleOuter: true,
-	    needleCircleInner: false,
-	    animationDuration: 1000,
-	    animationRule: "linear",
-	    colorBorderOuter: "#333",
-	    colorBorderOuterEnd: "#111",
-	    colorBorderMiddle: "#222",
-	    colorBorderMiddleEnd: "#111",
-	    colorBorderInner: "#111",
-	    colorBorderInnerEnd: "#333",
-	    colorNeedleShadowDown: "#333",
-	    colorNeedleCircleOuter: "#333",
-	    colorNeedleCircleOuterEnd: "#111",
-	    colorNeedleCircleInner: "#111",
-	    colorNeedleCircleInnerEnd: "#222",
-	    valueBoxBorderRadius: 0,
-	    colorValueBoxRect: "#222",
-	    colorValueBoxRectEnd: "#333"
-        });
     }
 
     return {
         name: "gauge",
+        canHandle: function (block) {
+            return block && block.type && block.type === 'gauge'
+        },
         init: function () {
 			DT_function.loadCSS('./js/components/gauge.css');
 			return DT_function.loadScript('//cdn.rawgit.com/Mikhus/canvas-gauges/gh-pages/download/2.1.7/all/gauge.min.js');
@@ -133,16 +45,13 @@ var DT_gauge = (function () {
 
 	    me.block.height = parseInt(height);
 
-	    var temp = device.Temp;
-	    console.log("Gauge temp:"+temp);
-
-	    console.log("Gauge layout:"+me.layout);
-	    console.log("Gauge height:"+height);
+	    var temp = device.Temp || 0;
+	    var prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 	    $(me.mountPoint + ' .dt_content').html(buildHTML(me));
 
 	    if(me.block.subtype === 'temperature1') {
-	        gauge = new LinearGauge({
+	        me.gauge = new LinearGauge({
 		    renderTo: 'gauge-'+me.block.idx,
 		    value: temp,
 		    width: 100,
@@ -150,9 +59,9 @@ var DT_gauge = (function () {
 	    }
 
 	    if(me.block.subtype === 'temperature') {
-	        gauge = new LinearGauge({
+	        me.gauge = new LinearGauge({
 		    renderTo: 'gauge-'+me.block.idx,
-		    width: me.block.wid,
+		    width: me.block.width,
 		    height: me.block.height,
 		    units: me.block.units,
 		    title: me.block.title,
@@ -212,11 +121,10 @@ var DT_gauge = (function () {
 	    }
 
 	    if(me.block.subtype === 'type1') {
-	        console.log("---> type1");
-	        gauge = new RadialGauge({
+	        me.gauge = new RadialGauge({
 		    renderTo: 'gauge-'+me.block.idx,
 		    value: temp,
-		    width: me.block.wid,
+		    width: me.block.width,
 		    height: me.block.height,
 		    units: me.block.units,
 		    minValue: 0,
@@ -252,39 +160,18 @@ var DT_gauge = (function () {
 		    needleCircleSize: 7,
 		    needleCircleOuter: true,
 		    needleCircleInner: false,
-		    animationDuration: 1500,
+		    animationDuration: prefersReducedMotion ? 0 : 1500,
 		    animationRule: "linear"
 	        });
 	    }
 
-
-        // gauge.value = temp;
-	    // gauge.draw();
-	    // $(me.mountPoint + ' .dt_content').html(gauge.options.renderTo);
-
-	    // console.log(gauge.options.renderTo);
-
-	    //$(me.mountPoint + ' .dt_content').html(buildHTML(me));
-
 	    //subscribe to sensor data
 	    Dashticz.subscribeDevice(me, me.block.idx, true, function (device) {
-	        this.value = device.Data;
-                gauge.value = device.Data;
-                //console.log("Subscribed: "+device);
+	        if (me.gauge) me.gauge.value = device.Data;
             });
-
-
 
         },
         refresh: function (me) {
-	    // if me.block.refresh is defined, and this function exists, then this function will be called every <me.block.refresh> seconds.
-
-	    //gauge.value = this.value;
-            //console.log("Refresh: "+gauge.value);
-
-            //	document.body.appendChild(gauge.options.renderTo);
-            //	$(me.mountPoint + ' .dt_content').html(buildHTML(me));
-
         }
     }
 })();

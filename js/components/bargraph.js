@@ -40,13 +40,9 @@ var DT_bargraph = (function () {
         element.appendChild(newText);
     }
 
-    function getColor(level) {
-        const colors = [
-            '#004d40', '#00796b', '#4caf50',
-            '#cddc39', '#ffeb3b', '#ffc107',
-            '#ff9800', '#f44336', '#d32f2f'
-        ];
-        return colors[level - 1];
+    function getColor(level, colors) {
+        var idx = Math.max(0, Math.min(colors.length - 1, level - 1));
+        return colors[idx];
     }
 
     return {
@@ -65,7 +61,12 @@ var DT_bargraph = (function () {
             type: 'bargraph',
             title: 'Bargraph',
             iconName: 'fas fa-bolt',
-
+            scale: 1,
+            colors: [
+                '#004d40', '#00796b', '#4caf50',
+                '#cddc39', '#ffeb3b', '#ffc107',
+                '#ff9800', '#f44336', '#d32f2f',
+            ],
         },
         run: function (me) {
 
@@ -85,7 +86,7 @@ var DT_bargraph = (function () {
 
                 segments.forEach((segment, index) => {
                     if (index < activeSegments) {
-                        segment.style.backgroundColor = getColor(index + 1);
+                        segment.style.backgroundColor = getColor(index + 1, me.block.colors);
                     } else {
                         segment.style.backgroundColor = 'lightgray';
                     }

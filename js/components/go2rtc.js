@@ -1,6 +1,7 @@
 /* global Dashticz DT_function*/
 
-var DT_go2rtc = {
+var DT_go2rtc = (function () {
+  return {
   buildIframeHTML: function (me) {
     const title = me.block.title;
     const go2rtcUrl = me.block.go2rtcUrl;
@@ -356,7 +357,8 @@ var DT_go2rtc = {
       });
     }
   },
-};
+  };
+})();
 
 Dashticz.register(DT_go2rtc);
 //# sourceURL=js/components/go2rtc.js

@@ -1,6 +1,9 @@
 var DT_rectline = (function ()  {
     return {
         name: "rectline",
+        canHandle: function (block) {
+            return block && block.type && block.type === 'rectline'
+        },
         init: function () {
             DT_function.loadCSS('./js/components/rectline.css');
             return DT_function.loadScript('//d3js.org/d3.v7.min.js');
@@ -15,6 +18,11 @@ var DT_rectline = (function ()  {
             orientation: 'horizontal',
             type: 'temperature',
             width: 3,
+            colors: [
+                [-1000, -15, 'blue'],
+                [-15, 0, 'lightblue'],
+                [0, 15, 'yellow'],
+            ],
         },
         run: function (me) {
             //this function will be called after the component has been initialized and has been mounted into the DOM.
@@ -100,7 +108,6 @@ var DT_rectline = (function ()  {
         
         if(me.block.orientation === "vertical")
         {
-            console.log("Vertical!")
             bar_width = 30;
             bar_height = 3;
             x = (width / 2) - bar_width;
@@ -130,7 +137,7 @@ var DT_rectline = (function ()  {
         
         for (let i = min; i < (min + number_of_bars); i += step) {
             
-            let classstr = build_classstr(i, value, step);
+            let classstr = build_classstr(i, value, step, me.block.colors);
             
             svg.append('rect')
                 .attr('x', x)
@@ -148,14 +155,7 @@ var DT_rectline = (function ()  {
         }
     }
     
-    function build_classstr(currentRect, value, step) {
-        
-        let colors = [
-            [-1000,-15,"blue"],
-            [-15,0,"lightblue"],
-            [0,15,"yellow"],
-        ];
-        
+    function build_classstr(currentRect, value, step, colors) {
         let classstr = "rect-" + currentRect;
         
         if (value >= currentRect && value < currentRect + step) {

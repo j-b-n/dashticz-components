@@ -30,10 +30,10 @@ var DT_p1_phaseload = (function () {
     // Assume three phases
     const phases = ["L1", "L2", "L3"];
 
-    function getColor(percent) {
-      if (percent < 33) return "green";
-      if (percent < 66) return "yellow";
-      return "red";
+    function getColor(percent, block) {
+      if (percent < block.threshold_low) return block.color_low;
+      if (percent < block.threshold_high) return block.color_mid;
+      return block.color_high;
     }
 
     var l1_voltage = 0;
@@ -68,14 +68,15 @@ var DT_p1_phaseload = (function () {
       l3_voltage.toFixed(decimals),
     ];
 
-    let html = `<svg viewBox="0 0 100 80" class="p1-phaseload-container" xmlns="http://www.w3.org/2000/svg">`;
+    var deviceLabel = device.Name || 'Phase load';
+    let html = `<svg viewBox="0 0 100 80" class="p1-phaseload-container" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${deviceLabel}"><title>${deviceLabel}</title>`;
 
     phases.forEach((phase, i) => {
       let current = currents[i] || 0;
       let percent = (current / me.block.max_current) * 100;
       if (percent > 100) percent = 100;
       let height = (percent / 100) * 50; // max height 50
-      const color = getColor(percent);
+      const color = getColor(percent, me.block);
       let x = 10 + i * 30;
       let rectY = 70 - height;
 
@@ -117,6 +118,11 @@ var DT_p1_phaseload = (function () {
       decimals: 1,
       voltage_divider: 1000,
       ampere_divider: 1000,
+      color_low: 'green',
+      color_mid: 'yellow',
+      color_high: 'red',
+      threshold_low: 33,
+      threshold_high: 66,
     },
     run: function (me) {
       me.layout = parseInt(0 + me.block.layout);
@@ -126,8 +132,6 @@ var DT_p1_phaseload = (function () {
         : parseInt($(me.mountPoint + " div").outerWidth());
 
       me.block.height = parseInt(height);
-
-      console.log(width, height);
 
       Dashticz.subscribeDevice(me, me.block.idx, true, function (device) {
         this.value = device.Data;

@@ -1,6 +1,7 @@
 /* global Dashticz DT_function*/
 
-var DT_clockcard = {
+var DT_clockcard = (function () {
+    return {
     buildClockHTML: function(me) {
         return '<div data-id="clock" class="block_' +
             me.block.type +
@@ -11,8 +12,8 @@ var DT_clockcard = {
             '<div class="clock-container"><div class="clock"></div></div>'+
             '<div class="date-container">'+
             '<div class="weekday"></div>'+
-            '<div class="clockcard_day"></div>'+
-            '<div class="clockcard_month"></div>'+
+            '<div class="clockcard_day-' + me.block.idx + '"></div>'+
+            '<div class="clockcard_month-' + me.block.idx + '"></div>'+
             '<em class="wi wi-sunrise"></em><span class="sunrise"></span><em class="wi wi-sunset"></em><span class="sunset"></span>' +
             '</div>'+            
             '</div>';        
@@ -24,34 +25,33 @@ var DT_clockcard = {
     canHandle: function (block) {
         return block && block.type && block.type === 'clockcard';
     },    
-    defaultCfg: { //All optional. defaultCfg can also be a function and then will receive block as parameter.
+    defaultCfg: {
         scale: 1,
         width: 12,
         title: '',
-
     },    
     run: function (me) {
-                
         var width = me.block.size || $(me.mountPoint + ' .dt_block').width();
         $(me.mountPoint + ' .dt_block').css('font-size', width / 6 * me.block.scale);
 
-        $(me.mountPoint ).html(this.buildClockHTML(me));
+        $(me.mountPoint).html(this.buildClockHTML(me));
 
-        const dateClock = setInterval(function dateTime() {
-            var currentTime = Date.now();
+        if (me._dateClock) clearInterval(me._dateClock);
+        me._dateClock = setInterval(function dateTime() {
             var today = new Date();
             let date = today.getDate();
             
-            $('.clockcard_day').html(date);
-            $('.clockcard_month').html(
+            $('.clockcard_day-' + me.block.idx).html(date);
+            $('.clockcard_month-' + me.block.idx).html(
                 moment().locale(settings['language']).format('MMMM')
             );
             
         }, 1000);
 
         
-    },    
-}
+    },
+    };
+})();
 
 Dashticz.register(DT_clockcard); //Don't forget to register the block
 //# sourceURL=js/components/clockcard.js

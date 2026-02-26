@@ -1,0 +1,26 @@
+.circle-gauge {
+    display: block;
+    width: 100%;
+    height: auto;
+    background-color: transparent;
+}
+
+.circle-gauge-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+}
+
+.circle-gauge text {
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+.circle-gauge-error {
+    color: #ff5566;
+    text-align: center;
+    padding: 1em;
+    font-size: 0.9em;
+}

@@ -330,8 +330,8 @@ var DT_d3 = (function () {
 		element = document.getElementById('d3-' + me.block.idx);
 		if (element) element.innerHTML = "";
 
-		d3.select("SVG-" + me.block.idx).remove();
-		d3.select("d3-" + me.block.idx).remove();
+		d3.select("#SVG-" + me.block.idx).remove();
+		d3.select("#d3-" + me.block.idx).remove();
 
 		//element = document.getElementById('d3-'+me.block.idx);
 

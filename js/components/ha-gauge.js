@@ -22,9 +22,9 @@ var DT_ha_gauge = (function () {
 		return color;
 	}
 
-	function getLinerGradient(value, arrayColors)
+	function getLinerGradient(value, arrayColors, idx)
 	{
-		html = '<linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">';
+		html = '<linearGradient id="gradient-' + idx + '" x1="0%" y1="0%" x2="100%" y2="0%">';
 		for (var i = 0; i < arrayColors.length; i++) {	
 			var color = arrayColors[i][1];
 			var percent = arrayColors[i][0];
@@ -66,13 +66,15 @@ var DT_ha_gauge = (function () {
 		angle = angle > 180 ? 180 : angle;
 		angle = angle < 0 ? 0 : angle;
 		
-		html = '<svg viewBox="-50 -50 100 80" class="ha-gauge" xmlns="http://www.w3.org/2000/svg">';
+		var ariaLabel = (typeof me.block.title !== 'undefined' ? me.block.title : device.Name) + ': ' + value + (typeof me.block.Unit !== 'undefined' ? ' ' + me.block.Unit : '');
+		html = '<svg viewBox="-50 -50 100 80" class="ha-gauge" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="' + ariaLabel + '">';
+		html += '<title>' + ariaLabel + '</title>';
 
 		if(me.block.GradientColors) {
 			html += '<defs>';
-			html += getLinerGradient(value, me.block.GradientColors);
+			html += getLinerGradient(value, me.block.GradientColors, me.block.idx);
 			html += '</defs>';
-			color = "url(#gradient)";
+			color = "url(#gradient-" + me.block.idx + ")";
 		} else {
 			color = getColor(value, me);
 		}
@@ -132,6 +134,9 @@ var DT_ha_gauge = (function () {
 
     return {
         name: "ha-gauge",
+        canHandle: function (block) {
+            return block && block.type && block.type === 'ha-gauge'
+        },
         init: function () {
 			return DT_function.loadCSS('./js/components/ha-gauge.css');
         },

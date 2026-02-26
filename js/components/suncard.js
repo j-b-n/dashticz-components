@@ -309,35 +309,36 @@ var DT_suncard = (function () {
   }
 
   function buildSuncardHTML(me) {
+    var idx = me.block.idx;
     return (
-      '<div id="suncard" class="suncard-wrapper">' +
+      '<div id="suncard-' + idx + '" class="suncard-wrapper">' +
       '<div class="suncard-times-header">' +
       '<div class="suncard-sunrise-column">' +
       '<div class="suncard-time-label">Sunrise</div>' +
-      '<div class="suncard-time-value" id="sunriseTime">--:--</div>' +
+      '<div class="suncard-time-value" id="sunriseTime-' + idx + '">--:--</div>' +
       "</div>" +
       '<div class="suncard-current-column">' +
       '<div class="suncard-time-label">Current time</div>' +
-      '<div class="suncard-time-value" id="currentTime">--:--</div>' +
+      '<div class="suncard-time-value" id="currentTime-' + idx + '">--:--</div>' +
       "</div>" +
       '<div class="suncard-sunset-column">' +
       '<div class="suncard-time-label">Sunset</div>' +
-      '<div class="suncard-time-value" id="sunsetTime">--:--</div>' +
+      '<div class="suncard-time-value" id="sunsetTime-' + idx + '">--:--</div>' +
       "</div>" +
       "</div>" +
-      `<svg id="mySunSvg" class="suncard-svg" viewBox="0 0 ${SVG_WIDTH} ${SVG_HEIGHT}" preserveAspectRatio="xMidYMid meet"></svg>` +
+      '<svg id="mySunSvg-' + idx + '" class="suncard-svg" viewBox="0 0 ' + SVG_WIDTH + ' ' + SVG_HEIGHT + '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Sun path visualization"></svg>' +
       '<div class="suncard-events">' +
       '<div class="suncard-event">' +
       '<div class="suncard-event-label">Dawn</div>' +
-      '<div class="suncard-event-time" id="dawnTime">--:--</div>' +
+      '<div class="suncard-event-time" id="dawnTime-' + idx + '">--:--</div>' +
       "</div>" +
       '<div class="suncard-event">' +
       '<div class="suncard-event-label">Solar noon</div>' +
-      '<div class="suncard-event-time" id="solarnoonTime">--:--</div>' +
+      '<div class="suncard-event-time" id="solarnoonTime-' + idx + '">--:--</div>' +
       "</div>" +
       '<div class="suncard-event">' +
       '<div class="suncard-event-label">Dusk</div>' +
-      '<div class="suncard-event-time" id="duskTime">--:--</div>' +
+      '<div class="suncard-event-time" id="duskTime-' + idx + '">--:--</div>' +
       "</div>" +
       "</div>" +
       "</div>"
@@ -345,6 +346,7 @@ var DT_suncard = (function () {
   }
 
   function draw_card(me) {
+    var idx = me.block.idx;
     const solarEvents = {
       sunrise: me.block.sunrise,
       sunset: me.block.sunset,
@@ -353,26 +355,26 @@ var DT_suncard = (function () {
       dusk: me.block.dusk,
     };
 
-    document.getElementById("sunriseTime").textContent = formatTime(
+    document.getElementById("sunriseTime-" + idx).textContent = formatTime(
       solarEvents.sunrise
     );
-    document.getElementById("sunsetTime").textContent = formatTime(
+    document.getElementById("sunsetTime-" + idx).textContent = formatTime(
       solarEvents.sunset
     );
-    document.getElementById("dawnTime").textContent = formatTime(
+    document.getElementById("dawnTime-" + idx).textContent = formatTime(
       solarEvents.dawn
     );
-    document.getElementById("duskTime").textContent = formatTime(
+    document.getElementById("duskTime-" + idx).textContent = formatTime(
       solarEvents.dusk
     );
-    document.getElementById("solarnoonTime").textContent = formatTime(
+    document.getElementById("solarnoonTime-" + idx).textContent = formatTime(
       solarEvents.solarnoon
     );
-    document.getElementById("currentTime").textContent = formatTime(new Date());
+    document.getElementById("currentTime-" + idx).textContent = formatTime(new Date());
 
     const progress = calculate24HourProgress(new Date());
 
-    drawSunPath("mySunSvg", progress, solarEvents);
+    drawSunPath("mySunSvg-" + idx, progress, solarEvents);
   }
 
   return {
@@ -429,7 +431,7 @@ var DT_suncard = (function () {
             draw_card(me);
 
             me.sunClock = setInterval(function updateDisplay() {
-              if (document.getElementById("suncard")) {
+              if (document.getElementById("suncard-" + me.block.idx)) {
                 draw_card(me);
               } else {
                 clearInterval(me.sunClock);

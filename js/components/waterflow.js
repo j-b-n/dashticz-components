@@ -32,29 +32,34 @@ var DT_waterflow = (function () {
     percent = percent > 100 ? 100 : percent;
     percent = percent < 0 ? 0 : percent;
 
+    var ariaLabel = (typeof me.block.title !== 'undefined' ? me.block.title : device.Name) + ': ' + value + (typeof me.block.Unit !== 'undefined' ? ' ' + me.block.Unit : ' L/min');
     var html =
-      '<svg viewBox="0 0 100 120" class="waterflow" xmlns="http://www.w3.org/2000/svg">';
+      '<svg viewBox="0 0 100 120" class="waterflow" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="' + ariaLabel + '">';
+    html += '<title>' + ariaLabel + '</title>';
 
     // Define clip path for fill level
     var dropStartY = 0;
     var dropHeight = 100;
     var clipHeight = dropHeight * (percent / 100);
     var clipY = dropStartY + dropHeight * (1 - percent / 100)+2;
+    var clipId = 'dropClip-' + me.block.idx;
+    var coldGradId = 'coldGradient-' + me.block.idx;
+    var hotGradId = 'hotGradient-' + me.block.idx;
     html += '<defs>';
     html += '<style>';
-    html += '#coldGradient > stop:first-child { stop-color: var(--waterflow-cold-light); }';
-    html += '#coldGradient > stop:last-child { stop-color: var(--waterflow-cold-dark); }';
-    html += '#hotGradient > stop:first-child { stop-color: var(--waterflow-hot-light); }';
-    html += '#hotGradient > stop:last-child { stop-color: var(--waterflow-hot-dark); }';
+    html += '#' + coldGradId + ' > stop:first-child { stop-color: var(--waterflow-cold-light); }';
+    html += '#' + coldGradId + ' > stop:last-child { stop-color: var(--waterflow-cold-dark); }';
+    html += '#' + hotGradId + ' > stop:first-child { stop-color: var(--waterflow-hot-light); }';
+    html += '#' + hotGradId + ' > stop:last-child { stop-color: var(--waterflow-hot-dark); }';
     html += '</style>';
-    html += '<clipPath id="dropClip">';
+    html += '<clipPath id="' + clipId + '">';
     html += '<rect x="0" y="' + clipY + '" width="100" height="' + clipHeight + '" />';
     html += '</clipPath>';
-    html += '<linearGradient id="coldGradient" x1="0%" y1="0%" x2="0%" y2="100%">';
+    html += '<linearGradient id="' + coldGradId + '" x1="0%" y1="0%" x2="0%" y2="100%">';
     html += '<stop offset="0%" style="stop-opacity:1" />';
     html += '<stop offset="100%" style="stop-opacity:1" />';
     html += '</linearGradient>';
-    html += '<linearGradient id="hotGradient" x1="0%" y1="0%" x2="0%" y2="100%">';
+    html += '<linearGradient id="' + hotGradId + '" x1="0%" y1="0%" x2="0%" y2="100%">';
     html += '<stop offset="0%" style="stop-opacity:1" />';
     html += '<stop offset="100%" style="stop-opacity:1" />';
     html += '</linearGradient>';
@@ -64,8 +69,8 @@ var DT_waterflow = (function () {
     html += '<path d="M61.38,18.68c-4.77,-6.86,-8.90,-12.78,-9.89,-15.62c-0.22,-0.62,-0.80,-1.04,-1.47,-1.05c-0.61,0.02,-1.26,0.40,-1.49,1.01c-1.02,2.68,-4.93,8.30,-9.47,14.81C28.68,32.75,14.46,53.18,14.46,66.51c0,19.61,15.94,35.55,35.55,35.55s35.55,-15.94,35.55,-35.55C85.50,53.39,71.58,33.34,61.38,18.68z" fill="none" stroke="white" stroke-width="2" />';
 
     // Filled drop
-    var waterClass = waterType === 'hot' ? 'waterflow-fill-hot' : 'waterflow-fill-cold';
-    html += '<path d="M61.38,18.68c-4.77,-6.86,-8.90,-12.78,-9.89,-15.62c-0.22,-0.62,-0.80,-1.04,-1.47,-1.05c-0.61,0.02,-1.26,0.40,-1.49,1.01c-1.02,2.68,-4.93,8.30,-9.47,14.81C28.68,32.75,14.46,53.18,14.46,66.51c0,19.61,15.94,35.55,35.55,35.55s35.55,-15.94,35.55,-35.55C85.50,53.39,71.58,33.34,61.38,18.68z" class="' + waterClass + '" clip-path="url(#dropClip)" />';
+    var gradientId = waterType === 'hot' ? hotGradId : coldGradId;
+    html += '<path d="M61.38,18.68c-4.77,-6.86,-8.90,-12.78,-9.89,-15.62c-0.22,-0.62,-0.80,-1.04,-1.47,-1.05c-0.61,0.02,-1.26,0.40,-1.49,1.01c-1.02,2.68,-4.93,8.30,-9.47,14.81C28.68,32.75,14.46,53.18,14.46,66.51c0,19.61,15.94,35.55,35.55,35.55s35.55,-15.94,35.55,-35.55C85.50,53.39,71.58,33.34,61.38,18.68z" fill="url(#' + gradientId + ')" clip-path="url(#' + clipId + ')" />';
 
     // Value text
     var textColor = me.block.textColor ? me.block.textColor : "white";
@@ -99,6 +104,9 @@ var DT_waterflow = (function () {
 
   return {
     name: "waterflow",
+    canHandle: function (block) {
+      return block && block.type && block.type === 'waterflow'
+    },
     init: function () {
       return DT_function.loadCSS("./js/components/waterflow.css");
     },

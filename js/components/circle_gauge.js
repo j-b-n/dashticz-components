@@ -146,7 +146,7 @@ var DT_circle_gauge = (function () {
   }
 
   function mycircle(me, device) {
-    const svgElement = document.getElementById("mySvgCanvas");
+    const svgElement = document.getElementById('circle-gauge-svg-' + me.block.idx);
     const svgNS = "http://www.w3.org/2000/svg"; // SVG Namespace
 
     if (svgElement) {
@@ -179,6 +179,12 @@ var DT_circle_gauge = (function () {
         value_text = value;
       }
       percent = (value / me.block.max) * 100;
+
+      var titleLabel = (device.Name || me.block.title || 'Gauge') + ': ' + value_text;
+      svgElement.setAttribute('aria-label', titleLabel);
+      var titleEl = document.createElementNS(svgNS, 'title');
+      titleEl.textContent = titleLabel;
+      svgElement.appendChild(titleEl);
 
       const centerX = 200;
       const centerY = 200;
@@ -247,88 +253,19 @@ var DT_circle_gauge = (function () {
     }
 
     html +=
-      '<svg id="mySvgCanvas" viewBox="0 0 400 400" class="gauge" xmlns="http://www.w3.org/2000/svg">';
+      '<svg id="circle-gauge-svg-' + me.block.idx + '" viewBox="0 0 400 400" class="circle-gauge" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="' + (me.block.title || 'Gauge') + '">';
     html += "</svg>\n";
 
-    return html;
-    //console.log(device);
-
-    switch (device.SubType) {
-      case "Custom":
-      case "Electric":
-        value = parseFloat(device.Data).toFixed(decimals);
-        break;
-      case "Temp + Humidity":
-        value = parseFloat(device.Temp).toFixed(decimals);
-        break;
-      case "Energy":
-        value = parseFloat(device.Usage).toFixed(decimals);
-        break;
-    }
-
-    percent = (value / me.block.max) * 100;
-    angle = 360 * (percent / 100);
-    angle = angle > 360 ? 360 : angle;
-    angle = angle < 0 ? 0 : angle;
-
-    html = "";
-    html +=
-      '<svg viewBox="0 0 100 100" class="gauge" xmlns="http://www.w3.org/2000/svg">';
-
-    if (me.block.GradientColors) {
-      html += "<defs>";
-      html += getLinerGradient(value, me.block.GradientColors);
-      html += "</defs>";
-      color = "url(#gradient)";
-    } else {
-      color = getColor(value, me);
-    }
-
-    html +=
-      '<circle cx="50" cy="50" r="' +
-      radius +
-      '" fill="none" stroke="grey" stroke-width="10" />';
-
-    var c = Math.PI * (radius * 2);
-    var pct = ((100 - percent) / 100) * c;
-
-    html +=
-      '<circle cx="50" cy="50" r="' +
-      radius +
-      '" fill="none" stroke="' +
-      color +
-      '" stroke-width="10"' +
-      ' stroke-dasharray="' +
-      c +
-      '" stroke-dashoffset="' +
-      pct +
-      '" transform="rotate(-90, 50,50)" "/>';
-
-    //Text
-    html +=
-      '<text x="50%" y="40%" text-anchor="middle" stroke-width="1px" stroke="white" fill="black" ' +
-      'font-size="20px" dy=".3em" font-family="FontAwesome" >\uf544</text>';
-
-    color = me.block.textColor ? me.block.textColor : "white";
-    html +=
-      '<text class="value-text" x="50%" y="60%" text-anchor="middle" dominant-baseline="middle" font-size="10px" fill="' +
-      color +
-      '">';
-    html += value;
-    if (typeof me.block.Unit !== "undefined") {
-      html += " " + me.block.Unit;
-    }
-    html += "</text>";
-
-    html += "</svg>\n";
-    html += "</div>";
     return html;
   }
 
   return {
     name: "circle-gauge",
+    canHandle: function (block) {
+      return block && block.type && block.type === 'circle-gauge'
+    },
     init: function () {
-      return DT_function.loadCSS("./js/components/ha-gauge.css");
+      return DT_function.loadCSS("./js/components/circle_gauge.css");
     },
     defaultCfg: {
       //title: '',
@@ -353,13 +290,6 @@ var DT_circle_gauge = (function () {
         me.block.needle = true;
         me.block.needleColor = "white";
 
-        //me.block.GradientColors =  [["0", "green"], ["40", "yellow"],["60","yellow"], ["100", "red"]];
-        /*
-				me.block.SolidColors =  [["0", "#ffffff"], ["10", "#ffe6e6"],["20","#ff9999"], ["30","#ff6666"], 
-										 ["40", "#ff3333"], ["50", "#ff0000"], ["60", "#cc0000"], ["70", "#990000"],
-										 ["80", "#660000"], ["90", "#330000"], ["100", "#000000"]];
-										 */
-        //me.block.SolidColor = "green";
         device = {
           Data: me.block.demoValue,
           Type: "Custom",
@@ -368,7 +298,8 @@ var DT_circle_gauge = (function () {
         };
         $(me.mountPoint + " .dt_content").html(buildHTML(me, device));
 
-        const interval = setInterval(function () {
+        if (me._demoInterval) clearInterval(me._demoInterval);
+        me._demoInterval = setInterval(function () {
           me.block.demoValue += me.block.max / me.block.segments;
 
           if (me.block.demoValue > me.block.max) {

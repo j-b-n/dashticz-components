@@ -1,7 +1,7 @@
 .block_clockcard_left {
     display: grid;
     grid-auto-flow: column;
-    grid-template-columns: repeat(4fr, 4fr);
+    grid-template-columns: 4fr 4fr;
     grid-template-areas: "clockcard_clock clockcard_date";
     align-items: center;
     background: rgba(0, 0, 0, 0.2);
@@ -12,7 +12,7 @@
 .block_clockcard_right {
     display: grid;
     grid-auto-flow: column;
-    grid-template-columns: repeat(4fr, 4fr);
+    grid-template-columns: 4fr 4fr;
     grid-template-areas: "clockcard_date clockcard_clock";
     align-items: center;
     background: rgba(0, 0, 0, 0.2);

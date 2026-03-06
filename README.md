@@ -16,6 +16,27 @@ Repository documentation:
 - `docs/runbooks/deployment.md` for installation and update steps
 - `docs/decisions/` for future architecture decision records
 
+### d3 widget
+The `d3` component can now render up to two devices in the same graph, which is useful for comparisons such as indoor vs outdoor temperature.
+
+Example block configuration:
+````javascript
+blocks['temp_compare'] = {
+	type: 'd3',
+	title: 'Temperature',
+	devices: [123, 456],
+	chartValue: 'te',
+	lineColors: ['#f2de63', '#9ad8e6'],
+	height: 155,
+}
+````
+
+Notes:
+- Use `devices` with one or two Domoticz device ids.
+- The existing `idx` configuration still works for a single-device chart.
+- `idx2` or `secondaryIdx` can also be used as the second device for backward-compatible custom configs.
+- `chartValue2` or `chartValues` can be used when the second device needs a different graph field.
+
 
 ### Prerequisites
 - [Domoticz](https://github.com/domoticz/domoticz)

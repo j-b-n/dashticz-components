@@ -3,6 +3,7 @@
 import os
 import shutil
 import subprocess
+import sys
 import tempfile
 
 def test_update_specials_no_duplicates():
@@ -14,7 +15,7 @@ def test_update_specials_no_duplicates():
 
         # Run the script the first time
         result1 = subprocess.run([
-            'python', 'scripts/update_specials_var.py',
+            sys.executable, 'scripts/update_specials_var.py',
             '--file', test_file,
             '--force'
         ], capture_output=True, text=True)
@@ -38,7 +39,7 @@ def test_update_specials_no_duplicates():
 
         # Run the script the second time
         result2 = subprocess.run([
-            'python', 'scripts/update_specials_var.py',
+            sys.executable, 'scripts/update_specials_var.py',
             '--file', test_file,
             '--force'
         ], capture_output=True, text=True)

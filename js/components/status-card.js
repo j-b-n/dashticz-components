@@ -84,8 +84,8 @@ var DT_status_card = (function () {
     function buildHTML(me) {
         var width = me.block.width || 3;
         var bgColor = me.block.backgroundColor || '#111827';
-        var icon = me.block.iconName || 'fa fa-home';
-        var title = me.block.title || 'Status';
+        var icon = me.block.iconName;
+        var title = me.block.title;
         var theme = me.block.theme || 'simple';
 
         var rowsHTML = '';
@@ -93,11 +93,16 @@ var DT_status_card = (function () {
             rowsHTML += buildRowHTML(me, deviceCfg);
         });
 
+        var headerHTML = '';
+        if (icon || title) {
+            headerHTML = '<div class="status-card-header">' +
+                (icon ? '<i class="status-card-header-icon ' + icon + '"></i>' : '') +
+                (title ? '<span class="status-card-header-title">' + title + '</span>' : '') +
+                '</div>';
+        }
+
         return '<div id="status-card-' + me.block.idx + '" class="block_status_card theme-' + theme + ' col-xs-' + width + '" style="background-color: ' + bgColor + ';">' +
-            '<div class="status-card-header">' +
-            '<i class="status-card-header-icon ' + icon + '"></i>' +
-            '<span class="status-card-header-title">' + title + '</span>' +
-            '</div>' +
+            headerHTML +
             '<div id="status-card-rows-' + me.block.idx + '" class="status-card-rows">' +
             rowsHTML +
             '</div>' +

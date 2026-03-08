@@ -43,9 +43,9 @@
 .status-card-row {
     position: relative;
     border-radius: 999px;
-    border: 2px solid rgba(180, 40, 0, 0.45);
+    border: 1px solid rgba(180, 40, 0, 0.45);
     background: rgba(0, 25, 0, 0.7);
-    height: 44px;
+    height: 26px;
     overflow: hidden;
 }
 
@@ -113,13 +113,13 @@
 
 /* Simple theme (default) */
 .block_status_card.theme-simple .status-card-row {
-    border: 2px solid rgba(180, 40, 0, 0.45);
+    border: 1px solid rgba(180, 40, 0, 0.45);
     background: rgba(0, 25, 0, 0.7);
 }
 
 /* Glow theme */
 .block_status_card.theme-glow .status-card-row {
-    border: 2px solid rgba(180, 40, 0, 0.45);
+    border: 1px solid rgba(180, 40, 0, 0.45);
     background: rgba(0, 25, 0, 0.7);
     box-shadow: 0 0 10px rgba(255, 100, 0, 0.3);
 }

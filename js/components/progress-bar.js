@@ -132,7 +132,7 @@ var DT_progress_bar = (function () {
             value: false, // false = no value, 'below' = centered below bar, 'after' = after header, 'left' = left of bar, 'right' = right of bar, 'inside' = inside bar
             theme: 'default',
             themes: {
-                default: '#007bff',
+                default: '#708090',
                 red: '#dc3545',
                 green: '#28a745',
                 yellow: '#ffc107',

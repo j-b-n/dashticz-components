@@ -1,56 +1,119 @@
 /*
-    Status card component for Dashticz. Displays one or more devices in a card format
-    with custom title, icon, and background color. Supports multiple device values.
+    Status card component for Dashticz. Displays a card with a header (icon + title)
+    and a list of device rows. Percentage devices show a gradient progress bar.
+
+    Config example:
+      blocks['my-card'] = {
+          type: 'status-card',
+          title: 'Home Server',
+          iconName: 'fa fa-server',
+          backgroundColor: '#111827',
+          width: 4,
+          theme: 'glow',
+          color: 'orange',
+          devices: [
+              { id: 123, icon: 'fa fa-microchip', label: 'CPU', color: 'green' },
+              { id: 456, icon: 'fa fa-thermometer-half', label: 'Temp', color: 'red' },
+              { id: 789, icon: 'fa fa-hdd-o', label: 'Disk' },
+          ]
+      }
+
+    Themes: 'simple', 'glow'
+    Colors: 'green', 'orange', 'red', 'yellow', 'blue', 'purple'
+    Simple form also supported: devices: [123, 456, 789]
 */
 
 var DT_status_card = (function () {
-    function buildHTML(me) {
-        var width = me.block.width || 3;
-        var bgColor = me.block.backgroundColor || '#4a5568';
+
+    function normalizeDevices(me) {
+        var raw = me.block.devices || [];
+        if (!Array.isArray(raw)) raw = [raw];
+        return raw.map(function (d) {
+            if (typeof d === 'object' && d !== null) return d;
+            return { id: d };
+        });
+    }
+
+    function isPercentage(device) {
+        return device && device.Data && device.Data.indexOf('%') !== -1;
+    }
+
+    function getPercentage(device) {
+        if (!device || !device.Data) return 0;
+        return Math.min(100, Math.max(0, parseFloat(device.Data) || 0));
+    }
+
+    function getDisplayValue(device, deviceCfg, me) {
+        var val = device.Data || device.Usage || device.Level || 'N/A';
+        var unit = deviceCfg.unit || me.block.unit || '';
+        if (unit && val.indexOf(unit) === -1) {
+            return val + ' ' + unit;
+        }
+        return val;
+    }
+
+    function buildRowHTML(me, deviceCfg) {
+        var device = Domoticz.getAllDevices(deviceCfg.id);
+        var showBar = deviceCfg.showBar !== false && (deviceCfg.showBar === true || isPercentage(device));
+        var pct = showBar && device ? getPercentage(device) : 0;
+        var icon = deviceCfg.icon || 'fa fa-circle';
+        var label;
+        if (deviceCfg.label === true) {
+            label = (device && device.Name) || ('Device ' + deviceCfg.id);
+        } else if (typeof deviceCfg.label === 'string') {
+            label = deviceCfg.label;
+        } else {
+            label = (device && device.Name) || ('Device ' + deviceCfg.id);
+        }
+        var displayValue = device ? getDisplayValue(device, deviceCfg, me) : 'N/A';
         
-        return '<div id="status-card-' + me.block.idx + '" class="block_status_card col-xs-' +
-            width +
-            '" style="background-color: ' + bgColor + ';">' +
-            '<div class="status-card-container">' +
-            '<div id="status-card-icon-' + me.block.idx + '" class="status-card-icon ' + (me.block.iconName || '') + '"></div>' +
-            '<div class="status-card-content">' +
-            '<div id="status-card-title-' + me.block.idx + '" class="status-card-title">' + (me.block.title || 'Status') + '</div>' +
-            '<div id="status-card-values-' + me.block.idx + '" class="status-card-values"></div>' +
-            '</div>' +
+        var rowColor = deviceCfg.color || me.block.color || '';
+        var colorClass = rowColor ? ' color-' + rowColor : '';
+
+        return '<div id="status-card-row-' + me.block.idx + '-' + deviceCfg.id + '"' +
+            ' class="status-card-row' + (showBar ? ' status-card-row-bar' : '') + colorClass + '"' +
+            (showBar ? ' style="--fill: ' + pct + '%"' : '') + '>' +
+            '<div class="status-card-row-content">' +
+            '<i class="status-card-row-icon ' + icon + '"></i>' +
+            '<span class="status-card-row-label">' + label + '</span>' +
+            '<span id="status-card-val-' + me.block.idx + '-' + deviceCfg.id + '" class="status-card-row-value">' + displayValue + '</span>' +
             '</div>' +
             '</div>';
     }
 
-    function drawCard(me) {
-        var valuesContainer = document.getElementById('status-card-values-' + me.block.idx);
-        
-        if (!valuesContainer) {
-            return;
-        }
-        
-        valuesContainer.innerHTML = '';
-        
-        // Handle both single device and multiple devices
-        var devices = Array.isArray(me.block.devices) ? me.block.devices : [me.block.devices];
-        
-        devices.forEach(function(deviceId) {
-            var device = Domoticz.getAllDevices(deviceId);
-            
-            if (device) {
-                var valueDiv = document.createElement('div');
-                valueDiv.className = 'status-card-value';
-                
-                var displayValue = device.Data || device.Usage || device.Level || 'N/A';
-                var unit = me.block.unit || '';
-                
-                valueDiv.textContent = displayValue + ' ' + unit;
-                valuesContainer.appendChild(valueDiv);
-            }
+    function buildHTML(me) {
+        var width = me.block.width || 3;
+        var bgColor = me.block.backgroundColor || '#111827';
+        var icon = me.block.iconName || 'fa fa-home';
+        var title = me.block.title || 'Status';
+        var theme = me.block.theme || 'simple';
+
+        var rowsHTML = '';
+        normalizeDevices(me).forEach(function (deviceCfg) {
+            rowsHTML += buildRowHTML(me, deviceCfg);
         });
+
+        return '<div id="status-card-' + me.block.idx + '" class="block_status_card theme-' + theme + ' col-xs-' + width + '" style="background-color: ' + bgColor + ';">' +
+            '<div class="status-card-header">' +
+            '<i class="status-card-header-icon ' + icon + '"></i>' +
+            '<span class="status-card-header-title">' + title + '</span>' +
+            '</div>' +
+            '<div id="status-card-rows-' + me.block.idx + '" class="status-card-rows">' +
+            rowsHTML +
+            '</div>' +
+            '</div>';
     }
 
-    function onDeviceUpdate(me, device) {
-        drawCard(me);
+    function updateDeviceDisplay(me, deviceCfg, device) {
+        var showBar = deviceCfg.showBar !== false && (deviceCfg.showBar === true || isPercentage(device));
+
+        var valEl = document.getElementById('status-card-val-' + me.block.idx + '-' + deviceCfg.id);
+        if (valEl) valEl.textContent = getDisplayValue(device, deviceCfg, me);
+
+        if (showBar) {
+            var rowEl = document.getElementById('status-card-row-' + me.block.idx + '-' + deviceCfg.id);
+            if (rowEl) rowEl.style.setProperty('--fill', getPercentage(device) + '%');
+        }
     }
 
     return {
@@ -65,28 +128,22 @@ var DT_status_card = (function () {
             width: 3,
             devices: [],
             title: 'Status',
-            iconName: 'fa fa-heart',
-            backgroundColor: '#4a5568',
-            unit: ''
+            iconName: 'fa fa-home',
+            backgroundColor: '#111827',
+            theme: 'simple',
+            color: ''  // e.g., 'green', 'orange', 'red', 'yellow', 'blue', 'purple'
         },
         run: function (me) {
-            me.html = buildHTML(me);
-            
-            // Subscribe to device updates
-            var devices = Array.isArray(me.block.devices) ? me.block.devices : [me.block.devices];
-            devices.forEach(function(deviceId) {
-                Dashticz.subscribeDevice(deviceId, onDeviceUpdate, me);
+            $(me.mountPoint).html(buildHTML(me));
+
+            normalizeDevices(me).forEach(function (deviceCfg) {
+                if (!deviceCfg.id) return;
+                Dashticz.subscribeDevice(me, deviceCfg.id, true, function (device) {
+                    updateDeviceDisplay(me, deviceCfg, device);
+                });
             });
-            
-            // Initial draw
-            setTimeout(function() {
-                drawCard(me);
-            }, 100);
         }
     };
 }());
 
-Dashticz.register({
-    key: 'status-card',
-    components: [DT_status_card]
-});
+Dashticz.register(DT_status_card);

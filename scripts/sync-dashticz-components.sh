@@ -14,7 +14,7 @@ echo "Using source path: ${DASHTICZ_COMPONENTS_SOURCE_PATH}"
 echo "Using target path: ${DASHTICZ_COMPONENTS_PATH}"
 
 # Default paths if not set
-DASHTICZ_COMPONENTS_SOURCE_PATH=${DASHTICZ_COMPONENTS_SOURCE_PATH:-/home/pi/dashticz-components/js/components/}
+DASHTICZ_COMPONENTS_SOURCE_PATH=${DASHTICZ_COMPONENTS_SOURCE_PATH:-$SCRIPT_DIR/../js/components/}
 DASHTICZ_COMPONENTS_PATH=${DASHTICZ_COMPONENTS_PATH:-/opt/stacks/dashticz/dashticz/js/components/}
 
 # Check if source path exists

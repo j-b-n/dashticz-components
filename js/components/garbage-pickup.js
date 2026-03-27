@@ -125,11 +125,91 @@ var DT_garbage_pickup = (function () {
         return 'Until pickup'
     }
 
-    function formatPickupDate(date) {
-        var language =
-            typeof settings !== 'undefined' && settings.language
-                ? settings.language
-                : undefined
+    function getRootClass(me, state) {
+        return (
+            'col-xs-' +
+            (me.block.width || 4) +
+            ' block_garbage-pickup dt_block state-' +
+            state
+        )
+    }
+
+    function getConfigValue(primaryKey, fallbackKey) {
+        if (typeof config !== 'undefined') {
+            if (config[primaryKey]) return config[primaryKey]
+            if (fallbackKey && config[fallbackKey]) return config[fallbackKey]
+        }
+
+        if (typeof settings !== 'undefined') {
+            if (settings[primaryKey]) return settings[primaryKey]
+            if (fallbackKey && settings[fallbackKey])
+                return settings[fallbackKey]
+        }
+
+        return ''
+    }
+
+    function getLocaleTag() {
+        var language = getConfigValue('calendarlanguage', 'language')
+        var normalizedLanguage
+
+        if (language && language.toString) language = language.toString().trim()
+        if (!language) return undefined
+
+        normalizedLanguage = language.replace(/_/g, '-')
+
+        if (typeof Intl === 'undefined' || !Intl.getCanonicalLocales) {
+            return normalizedLanguage
+        }
+
+        try {
+            return Intl.getCanonicalLocales(normalizedLanguage)[0]
+        } catch (error) {
+            return undefined
+        }
+    }
+
+    function getMomentLocale() {
+        var language = getConfigValue('calendarlanguage', 'language')
+
+        if (language && language.toString) language = language.toString().trim()
+        if (!language) return undefined
+
+        return language.replace(/_/g, '-').toLowerCase()
+    }
+
+    function hasExplicitTime(rawValue) {
+        return /[ T]\d{1,2}:\d{2}(?::\d{2})?$/.test(
+            (rawValue || '').toString().trim(),
+        )
+    }
+
+    function getCalendarFormat(includeTime) {
+        var configuredFormat =
+            getConfigValue('calendarformat') || getConfigValue('timeformat')
+
+        if (!configuredFormat) return 'ddd D MMM YYYY'
+        if (includeTime) return configuredFormat
+
+        return (
+            configuredFormat
+                .replace(/\s+[Hh]{1,2}[:.]mm(?::ss)?\s*[Aa]?$/g, '')
+                .trim() || 'ddd D MMM YYYY'
+        )
+    }
+
+    function formatPickupDate(date, rawValue) {
+        var includeTime = hasExplicitTime(rawValue)
+        var calendarFormat = getCalendarFormat(includeTime)
+        var language = getLocaleTag()
+        var momentLocale = getMomentLocale()
+
+        if (typeof moment !== 'undefined') {
+            return moment(date)
+                .locale(momentLocale || undefined)
+                .format(calendarFormat)
+        }
+
         return date.toLocaleDateString(language, {
             weekday: 'short',
             day: 'numeric',
@@ -157,12 +237,7 @@ var DT_garbage_pickup = (function () {
         if (!root || !icon) return
 
         if (!pickupDate) {
-            root.className =
-                'block_' +
-                me.block.type +
-                ' col-xs-' +
-                (me.block.width || 4) +
-                ' state-invalid'
+            root.className = getRootClass(me, 'invalid')
             icon.className = 'garbage-pickup-icon ' + me.block.iconDefault
             setText(
                 'garbage-pickup-countdown-' + me.block.idx,
@@ -181,13 +256,7 @@ var DT_garbage_pickup = (function () {
 
         stateInfo = getStateInfo(pickupDate)
 
-        root.className =
-            'block_' +
-            me.block.type +
-            ' col-xs-' +
-            (me.block.width || 4) +
-            ' state-' +
-            stateInfo.state
+        root.className = getRootClass(me, stateInfo.state)
         icon.className = 'garbage-pickup-icon ' + getIcon(me, stateInfo.state)
         setText(
             'garbage-pickup-countdown-' + me.block.idx,
@@ -199,7 +268,7 @@ var DT_garbage_pickup = (function () {
         )
         setText(
             'garbage-pickup-date-' + me.block.idx,
-            formatPickupDate(pickupDate),
+            formatPickupDate(pickupDate, rawValue),
         )
     }
 
@@ -209,11 +278,9 @@ var DT_garbage_pickup = (function () {
         return (
             '<div id="garbage-pickup-' +
             me.block.idx +
-            '" class="block_' +
-            me.block.type +
-            ' col-xs-' +
+            '" data-id="garbage-pickup" class="col-xs-' +
             width +
-            ' state-upcoming">' +
+            ' block_garbage-pickup dt_block state-upcoming">' +
             '<div class="garbage-pickup-card">' +
             '<div class="garbage-pickup-icon-shell">' +
             '<i id="garbage-pickup-icon-' +

@@ -2,57 +2,62 @@
 
 var DT_clockcard = (function () {
     return {
-    buildClockHTML: function(me) {
-        return '<div data-id="clock" class="block_' +
-            me.block.type +
-            (me.block.location==='right'?'_right':'_left')+
-            ' col-xs-' +
-            me.block.width +            
-            '">'+
-            '<div class="clock-container"><div class="clock"></div></div>'+
-            '<div class="date-container">'+
-            '<div class="weekday"></div>'+
-            '<div class="clockcard_day-' + me.block.idx + '"></div>'+
-            '<div class="clockcard_month-' + me.block.idx + '"></div>'+
-            '<em class="wi wi-sunrise"></em><span class="sunrise"></span><em class="wi wi-sunset"></em><span class="sunset"></span>' +
-            '</div>'+            
-            '</div>';        
-    },
-    name: "clockcard",
-    init: function () {
-        return DT_function.loadCSS('./js/components/clockcard.css');
-    },
-    canHandle: function (block) {
-        return block && block.type && block.type === 'clockcard';
-    },    
-    defaultCfg: {
-        scale: 1,
-        width: 12,
-        title: '',
-    },    
-    run: function (me) {
-        var width = me.block.size || $(me.mountPoint + ' .dt_block').width();
-        $(me.mountPoint + ' .dt_block').css('font-size', width / 6 * me.block.scale);
+        buildClockHTML: function (me) {
+            return (
+                '<div data-id="clock" class="block_' +
+                me.block.type +
+                (me.block.location === 'right' ? '_right' : '_left') +
+                ' col-xs-' +
+                me.block.width +
+                '">' +
+                '<div class="clock-container"><div class="clock"></div></div>' +
+                '<div class="date-container">' +
+                '<div class="weekday"></div>' +
+                '<div class="clockcard_day-' +
+                me.block.idx +
+                '"></div>' +
+                '<div class="clockcard_month-' +
+                me.block.idx +
+                '"></div>' +
+                '<em class="wi wi-sunrise"></em><span class="sunrise"></span><em class="wi wi-sunset"></em><span class="sunset"></span>' +
+                '</div>' +
+                '</div>'
+            )
+        },
+        name: 'clockcard',
+        init: function () {
+            return DT_function.loadCSS('./js/components/clockcard.css')
+        },
+        canHandle: function (block) {
+            return block && block.type && block.type === 'clockcard'
+        },
+        defaultCfg: {
+            scale: 1,
+            width: 12,
+            title: '',
+        },
+        run: function (me) {
+            var width = me.block.size || $(me.mountPoint + ' .dt_block').width()
+            $(me.mountPoint + ' .dt_block').css(
+                'font-size',
+                (width / 6) * me.block.scale,
+            )
 
-        $(me.mountPoint).html(this.buildClockHTML(me));
+            $(me.mountPoint).html(this.buildClockHTML(me))
 
-        if (me._dateClock) clearInterval(me._dateClock);
-        me._dateClock = setInterval(function dateTime() {
-            var today = new Date();
-            let date = today.getDate();
-            
-            $('.clockcard_day-' + me.block.idx).html(date);
-            $('.clockcard_month-' + me.block.idx).html(
-                moment().locale(settings['language']).format('MMMM')
-            );
-            
-        }, 1000);
+            if (me._dateClock) clearInterval(me._dateClock)
+            me._dateClock = setInterval(function dateTime() {
+                var today = new Date()
+                let date = today.getDate()
 
-        
-    },
-    };
-})();
+                $('.clockcard_day-' + me.block.idx).html(date)
+                $('.clockcard_month-' + me.block.idx).html(
+                    moment().locale(settings['language']).format('MMMM'),
+                )
+            }, 1000)
+        },
+    }
+})()
 
-Dashticz.register(DT_clockcard); //Don't forget to register the block
+Dashticz.register(DT_clockcard) //Don't forget to register the block
 //# sourceURL=js/components/clockcard.js
-

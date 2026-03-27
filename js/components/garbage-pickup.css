@@ -1,0 +1,118 @@
+.block_garbage-pickup {
+    --garbage-bg: linear-gradient(145deg, #173426 0%, #0c1f17 100%);
+    --garbage-border: rgba(108, 182, 129, 0.45);
+    --garbage-accent: #8bd6a0;
+    --garbage-pill-bg: rgba(255, 255, 255, 0.08);
+    color: #f4f8f2;
+}
+
+.block_garbage-pickup.state-tomorrow {
+    --garbage-bg: linear-gradient(145deg, #4a2f0f 0%, #251509 100%);
+    --garbage-border: rgba(255, 177, 74, 0.5);
+    --garbage-accent: #ffbf5e;
+}
+
+.block_garbage-pickup.state-today {
+    --garbage-bg: linear-gradient(145deg, #6b1f14 0%, #31100c 100%);
+    --garbage-border: rgba(255, 116, 95, 0.58);
+    --garbage-accent: #ff8d79;
+}
+
+.block_garbage-pickup.state-overdue,
+.block_garbage-pickup.state-invalid {
+    --garbage-bg: linear-gradient(145deg, #4b1d27 0%, #241017 100%);
+    --garbage-border: rgba(213, 115, 143, 0.5);
+    --garbage-accent: #f3a5b9;
+}
+
+.garbage-pickup-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 80px;
+    padding: 10px 14px;
+    border-radius: 14px;
+    border: 1px solid var(--garbage-border);
+    background: var(--garbage-bg);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+.garbage-pickup-icon-shell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    flex-shrink: 0;
+}
+
+.garbage-pickup-icon {
+    font-size: 1.8em;
+    color: var(--garbage-accent);
+}
+
+.garbage-pickup-copy {
+    min-width: 0;
+    flex: 1;
+}
+
+.garbage-pickup-title {
+    font-size: 1.02em;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    opacity: 0.9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.garbage-pickup-countdown {
+    margin-top: 2px;
+    font-size: 1.7em;
+    line-height: 1;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.garbage-pickup-status {
+    display: inline-flex;
+    margin-top: 4px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--garbage-pill-bg);
+    color: var(--garbage-accent);
+    font-size: 0.82em;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.garbage-pickup-date {
+    margin-top: 4px;
+    font-size: 0.88em;
+    opacity: 0.84;
+}
+
+@media screen and (max-width: 767px) {
+    .garbage-pickup-card {
+        min-height: 72px;
+        padding: 8px 12px;
+        gap: 12px;
+    }
+
+    .garbage-pickup-icon-shell {
+        width: 44px;
+        height: 44px;
+    }
+
+    .garbage-pickup-icon {
+        font-size: 1.6em;
+    }
+
+    .garbage-pickup-countdown {
+        font-size: 1.5em;
+    }
+}

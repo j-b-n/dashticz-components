@@ -122,7 +122,7 @@ var DT_garbage_pickup = (function () {
         if (dayDiff === 0) return 'Pickup day'
         if (dayDiff === 1) return 'Put it out tonight'
         if (dayDiff < 0) return 'Waiting for the next date'
-        return 'Until pickup'
+        return ''
     }
 
     function getRootClass(me, state) {
@@ -178,49 +178,35 @@ var DT_garbage_pickup = (function () {
         return language.replace(/_/g, '-').toLowerCase()
     }
 
-    function hasExplicitTime(rawValue) {
-        return /[ T]\d{1,2}:\d{2}(?::\d{2})?$/.test(
-            (rawValue || '').toString().trim(),
-        )
-    }
-
-    function getCalendarFormat(includeTime) {
-        var configuredFormat =
-            getConfigValue('calendarformat') || getConfigValue('timeformat')
-
-        if (!configuredFormat) return 'ddd D MMM YYYY'
-        if (includeTime) return configuredFormat
-
-        return (
-            configuredFormat
-                .replace(/\s+[Hh]{1,2}[:.]mm(?::ss)?\s*[Aa]?$/g, '')
-                .trim() || 'ddd D MMM YYYY'
-        )
-    }
-
     function formatPickupDate(date, rawValue) {
-        var includeTime = hasExplicitTime(rawValue)
-        var calendarFormat = getCalendarFormat(includeTime)
         var language = getLocaleTag()
         var momentLocale = getMomentLocale()
 
         if (typeof moment !== 'undefined') {
             return moment(date)
                 .locale(momentLocale || undefined)
-                .format(calendarFormat)
+                .format('D MMM')
         }
 
         return date.toLocaleDateString(language, {
-            weekday: 'short',
             day: 'numeric',
             month: 'short',
-            year: 'numeric',
         })
     }
 
     function setText(elementId, value) {
         var element = document.getElementById(elementId)
         if (element) element.textContent = value
+    }
+
+    function setOptionalText(elementId, value) {
+        var element = document.getElementById(elementId)
+        var text = (value || '').toString().trim()
+
+        if (!element) return
+
+        element.textContent = text
+        element.style.display = text ? '' : 'none'
     }
 
     function updateCard(me, device) {
@@ -232,7 +218,9 @@ var DT_garbage_pickup = (function () {
         var pickupDate = parsePickupDate(rawValue)
         var stateInfo
 
-        setText('garbage-pickup-title-' + me.block.idx, getTitle(me, device))
+        var title = getTitle(me, device)
+        if (title)
+         setText('garbage-pickup-title-' + me.block.idx, title)
 
         if (!root || !icon) return
 
@@ -243,7 +231,7 @@ var DT_garbage_pickup = (function () {
                 'garbage-pickup-countdown-' + me.block.idx,
                 'No valid pickup date',
             )
-            setText(
+            setOptionalText(
                 'garbage-pickup-status-' + me.block.idx,
                 'Expected a device value like 2026-03-28',
             )
@@ -262,7 +250,7 @@ var DT_garbage_pickup = (function () {
             'garbage-pickup-countdown-' + me.block.idx,
             getCountdownLabel(stateInfo.dayDiff),
         )
-        setText(
+        setOptionalText(
             'garbage-pickup-status-' + me.block.idx,
             getStatusLabel(stateInfo.dayDiff),
         )

@@ -613,7 +613,7 @@ var DT_d3 = (function () {
      * All graph data must be available.
      */
     function d3FormatData(me, seriesResults) {
-        var max = me.block.width
+        var max = me._pixelWidth || me.block.width
         me.seriesData = []
 
         $.each(seriesResults, function (seriesIndex, seriesResult) {

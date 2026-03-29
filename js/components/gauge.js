@@ -50,6 +50,7 @@ var DT_gauge = (function () {
 
             me.block.height = parseInt(height)
 
+            var gaugePxWidth = parseInt($(me.mountPoint + ' div').innerWidth()) || me.block.height
             var temp = device.Temp || 0
             var prefersReducedMotion =
                 window.matchMedia &&
@@ -68,7 +69,7 @@ var DT_gauge = (function () {
             if (me.block.subtype === 'temperature') {
                 me.gauge = new LinearGauge({
                     renderTo: 'gauge-' + me.block.idx,
-                    width: me.block.width,
+                    width: gaugePxWidth,
                     height: me.block.height,
                     units: me.block.units,
                     title: me.block.title,
@@ -121,7 +122,7 @@ var DT_gauge = (function () {
                 me.gauge = new RadialGauge({
                     renderTo: 'gauge-' + me.block.idx,
                     value: temp,
-                    width: me.block.width,
+                    width: gaugePxWidth,
                     height: me.block.height,
                     units: me.block.units,
                     minValue: 0,

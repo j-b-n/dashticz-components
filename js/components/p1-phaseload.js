@@ -7,6 +7,14 @@
 */
 
 var DT_p1_phaseload = (function () {
+    function escHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+    }
+
     function buildHTML(me, device) {
         let decimals = 1
         if (typeof me.block.decimals !== 'undefined') {
@@ -71,7 +79,7 @@ var DT_p1_phaseload = (function () {
             l3_voltage.toFixed(decimals),
         ]
 
-        var deviceLabel = device.Name || 'Phase load'
+        var deviceLabel = escHtml(device.Name || 'Phase load')
         let html = `<svg viewBox="0 0 100 80" class="p1-phaseload-container" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${deviceLabel}"><title>${deviceLabel}</title>`
 
         phases.forEach((phase, i) => {

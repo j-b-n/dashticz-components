@@ -39,7 +39,7 @@ var DT_rectline = (function () {
             var width = parseInt(me.$mountPoint.find('div').innerWidth())
 
             me.block.height = parseInt(height)
-            me.block.width = parseInt(width)
+            me._pixelWidth = parseInt(width)
 
             //	var temp = Domoticz.getAllDevices(me.block.idx).Temp;
 
@@ -81,7 +81,7 @@ var DT_rectline = (function () {
         // Setting dimensions
 
         const margin = { top: 10, right: 5, bottom: 0, left: 5 },
-            width = me.block.width,
+            width = me._pixelWidth || me.block.width,
             height = me.block.height
 
         var svg = d3

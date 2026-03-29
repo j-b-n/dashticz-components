@@ -466,16 +466,8 @@ var DT_suncard = (function () {
 
                         draw_card(me)
 
-                        me.sunClock = setInterval(function updateDisplay() {
-                            if (
-                                document.getElementById(
-                                    'suncard-' + me.block.idx,
-                                )
-                            ) {
-                                draw_card(me)
-                            } else {
-                                clearInterval(me.sunClock)
-                            }
+                        Dashticz.setInterval(me, function () {
+                            draw_card(me)
                         }, 60000)
                     } else {
                         throw new Error('Invalid Domoticz response')

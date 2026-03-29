@@ -331,8 +331,7 @@ var DT_garbage_pickup = (function () {
                 updateCard(me, device)
             })
 
-            if (me._garbagePickupTimer) clearInterval(me._garbagePickupTimer)
-            me._garbagePickupTimer = setInterval(function () {
+            Dashticz.setInterval(me, function () {
                 refreshFromDevice(me)
             }, refreshInterval)
         },

@@ -210,7 +210,7 @@ var DT_d3 = (function () {
 
         if (me.block.height > 155) me.block.height = 155
 
-        me.block.width = parseInt(width)
+        me._pixelWidth = parseInt(width)
 
         me.deviceIdxs = d3ResolveDeviceIdxs(me)
         me.graphDevices = []
@@ -456,7 +456,7 @@ var DT_d3 = (function () {
         //var w = parseInt(me.$mountPoint.width()); // * me.block.scale);
         //var w = parseInt(me.$mountPoint.find('div').innerWidth())
         //var h = parseInt($(me.mountPoint + ' div').outerWidth());
-        var w = me.block.width
+        var w = me._pixelWidth || me.block.width
         var h = me.block.height
 
         // Setting dimensions
@@ -701,6 +701,9 @@ var DT_d3 = (function () {
 
     return {
         name: 'd3',
+        canHandle: function (block) {
+            return block && block.type && block.type === 'd3'
+        },
         init: function () {
             DT_function.loadCSS('./js/components/d3.css')
             return DT_function.loadScript('//d3js.org/d3.v7.min.js')

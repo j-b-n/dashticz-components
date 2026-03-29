@@ -45,10 +45,9 @@ var DT_clockcard = (function () {
 
             $(me.mountPoint).html(this.buildClockHTML(me))
 
-            if (me._dateClock) clearInterval(me._dateClock)
-            me._dateClock = setInterval(function dateTime() {
+            Dashticz.setInterval(me, function () {
                 var today = new Date()
-                let date = today.getDate()
+                var date = today.getDate()
 
                 $('.clockcard_day-' + me.block.idx).html(date)
                 $('.clockcard_month-' + me.block.idx).html(

@@ -24,6 +24,14 @@
 */
 
 var DT_status_card = (function () {
+    function escHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+    }
+
     function normalizeDevices(me) {
         var raw = me.block.devices || []
         if (!Array.isArray(raw)) raw = [raw]
@@ -90,14 +98,14 @@ var DT_status_card = (function () {
             icon +
             '"></i>' +
             '<span class="status-card-row-label">' +
-            label +
+            escHtml(label) +
             '</span>' +
             '<span id="status-card-val-' +
             me.block.idx +
             '-' +
             deviceCfg.id +
             '" class="status-card-row-value">' +
-            displayValue +
+            escHtml(displayValue) +
             '</span>' +
             '</div>' +
             '</div>'

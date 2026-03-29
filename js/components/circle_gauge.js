@@ -22,7 +22,7 @@ var DT_circle_gauge = (function () {
     }
 
     function getLinerGradient(value, arrayColors) {
-        html =
+        var html =
             '<linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">'
         for (var i = 0; i < arrayColors.length; i++) {
             var color = arrayColors[i][1]
@@ -160,6 +160,8 @@ var DT_circle_gauge = (function () {
         if (svgElement) {
             svgElement.innerHTML = ''
             var value_text = ''
+            var value = 0
+            var percent = 0
             var decimals = 0
             var textColor = 'white'
             if (typeof me.block.decimals !== 'undefined') {
@@ -299,33 +301,31 @@ var DT_circle_gauge = (function () {
 
             me.block.height = parseInt(height)
 
-            if (me.block.demo == true) {
+            if (me.block.demo === true) {
                 me.block.needle = true
                 me.block.needleColor = 'white'
 
-                device = {
+                var demoDevice = {
                     Data: me.block.demoValue,
                     Type: 'Custom',
                     SubType: 'Custom',
                     idx: 1,
                 }
-                $(me.mountPoint + ' .dt_content').html(buildHTML(me, device))
+                $(me.mountPoint + ' .dt_content').html(buildHTML(me, demoDevice))
 
-                if (me._demoInterval) clearInterval(me._demoInterval)
-                me._demoInterval = setInterval(function () {
+                Dashticz.setInterval(me, function () {
                     me.block.demoValue += me.block.max / me.block.segments
 
                     if (me.block.demoValue > me.block.max) {
                         me.block.demoValue = 0
                     }
-                    device = {
+                    var demoDevice = {
                         Data: me.block.demoValue,
                         Type: 'Custom',
                         SubType: 'Custom',
                         idx: 1,
                     }
-                    mycircle(me, device)
-                    //$(me.mountPoint + " .dt_content").html(buildHTML(me, device));
+                    mycircle(me, demoDevice)
                 }, 1000)
             } else {
                 var device = Domoticz.getAllDevices(me.block.idx)

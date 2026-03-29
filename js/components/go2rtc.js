@@ -1,6 +1,14 @@
 /* global Dashticz DT_function*/
 
 var DT_go2rtc = (function () {
+    function escHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+    }
+
     return {
         buildIframeHTML: function (me) {
             const title = me.block.title
@@ -15,7 +23,7 @@ var DT_go2rtc = (function () {
                     me.block.width +
                     ' camera dt_block">' +
                     (title
-                        ? '<div class="go2rtc-title">' + title + '</div>'
+                        ? '<div class="go2rtc-title">' + escHtml(title) + '</div>'
                         : '') +
                     '<div class="go2rtc-error">Stream name not configured</div>' +
                     '</div>'
@@ -34,12 +42,12 @@ var DT_go2rtc = (function () {
                 '<div data-id="go2rtc" class="col-xs-' +
                 me.block.width +
                 ' block_go2rtc dt_block">' +
-                (title ? '<div class="go2rtc-title">' + title + '</div>' : '') +
+                (title ? '<div class="go2rtc-title">' + escHtml(title) + '</div>' : '') +
                 '<div class="go2rtc-wrapper">' +
                 '<iframe id="' +
                 iframeId +
                 '" class="go2rtc-iframe" src="' +
-                streamUrl +
+                escHtml(streamUrl) +
                 '" frameborder="0" scrolling="no" allow="microphone; camera" allowfullscreen></iframe>' +
                 '</div>' +
                 '</div>'
@@ -58,7 +66,7 @@ var DT_go2rtc = (function () {
                     me.block.width +
                     ' camera dt_block">' +
                     (title
-                        ? '<div class="go2rtc-title">' + title + '</div>'
+                        ? '<div class="go2rtc-title">' + escHtml(title) + '</div>'
                         : '') +
                     '<div class="go2rtc-error">Stream name not configured</div>' +
                     '</div>'
@@ -69,7 +77,7 @@ var DT_go2rtc = (function () {
                 '<div data-id="go2rtc" class="col-xs-' +
                 me.block.width +
                 ' block_go2rtc dt_block">' +
-                (title ? '<div class="go2rtc-title">' + title + '</div>' : '') +
+                (title ? '<div class="go2rtc-title">' + escHtml(title) + '</div>' : '') +
                 '<div class="go2rtc-wrapper">' +
                 '<video id="' +
                 videoId +
@@ -304,21 +312,8 @@ var DT_go2rtc = (function () {
         run: function (me) {
             const go2rtcType = me.block.go2rtcType || 'iframe'
 
-            // Clean up old event listeners if they exist
-            if (me.go2rtcData) {
-                if (me.go2rtcData.visibilityHandler) {
-                    document.removeEventListener(
-                        'visibilitychange',
-                        me.go2rtcData.visibilityHandler,
-                    )
-                }
-                if (me.go2rtcData.standbyObserver) {
-                    me.go2rtcData.standbyObserver.disconnect()
-                }
-                if (me.go2rtcData.iframeStandbyObserver) {
-                    me.go2rtcData.iframeStandbyObserver.disconnect()
-                }
-            }
+            // Clean up non-Dashticz listeners from any previous run
+            this.destroy(me)
 
             // Select builder based on type
             const html =
@@ -391,6 +386,27 @@ var DT_go2rtc = (function () {
                     me.block.go2rtcType = 'iframe'
                     this.run(me) // Re-render as iframe
                 })
+            }
+        },
+
+        destroy: function (me) {
+            if (me.go2rtcData) {
+                if (me.go2rtcData.visibilityHandler) {
+                    document.removeEventListener(
+                        'visibilitychange',
+                        me.go2rtcData.visibilityHandler,
+                    )
+                }
+                if (me.go2rtcData.standbyObserver) {
+                    me.go2rtcData.standbyObserver.disconnect()
+                }
+                if (me.go2rtcData.iframeStandbyObserver) {
+                    me.go2rtcData.iframeStandbyObserver.disconnect()
+                }
+                if (me.go2rtcData.pc) {
+                    me.go2rtcData.pc.close()
+                }
+                me.go2rtcData = null
             }
         },
     }

@@ -4,6 +4,14 @@
 */
 
 var DT_waterflow = (function () {
+    function escHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+    }
+
     function buildHTML(me, device) {
         var value = '0'
         var percent = 0
@@ -33,13 +41,15 @@ var DT_waterflow = (function () {
         percent = percent < 0 ? 0 : percent
 
         var ariaLabel =
-            (typeof me.block.title !== 'undefined'
-                ? me.block.title
-                : device.Name) +
+            escHtml(
+                typeof me.block.title !== 'undefined'
+                    ? me.block.title
+                    : device.Name,
+            ) +
             ': ' +
             value +
             (typeof me.block.Unit !== 'undefined'
-                ? ' ' + me.block.Unit
+                ? ' ' + escHtml(me.block.Unit)
                 : ' L/min')
         var html =
             '<svg viewBox="0 0 100 120" class="waterflow" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="' +
@@ -131,9 +141,9 @@ var DT_waterflow = (function () {
             textColor +
             '">'
         if (typeof me.block.title !== 'undefined') {
-            html += me.block.title
+            html += escHtml(me.block.title)
         } else {
-            html += device.Name
+            html += escHtml(device.Name)
         }
         html += '</text>'
 
@@ -166,7 +176,7 @@ var DT_waterflow = (function () {
 
             me.block.height = parseInt(height)
 
-            if (me.block.demo == true) {
+            if (me.block.demo === true) {
                 device = {
                     Data: me.block.demoValue || 50,
                     SubType: 'Custom',

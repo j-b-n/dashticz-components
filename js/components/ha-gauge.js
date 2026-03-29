@@ -3,6 +3,14 @@
 */
 
 var DT_ha_gauge = (function () {
+    function escHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+    }
+
     function getColor(value, me) {
         if (typeof me.block.SolidColor !== 'undefined') {
             return me.block.SolidColor
@@ -21,7 +29,7 @@ var DT_ha_gauge = (function () {
     }
 
     function getLinerGradient(value, arrayColors, idx) {
-        html =
+        var html =
             '<linearGradient id="gradient-' +
             idx +
             '" x1="0%" y1="0%" x2="100%" y2="0%">'
@@ -44,6 +52,7 @@ var DT_ha_gauge = (function () {
         var value = '0'
         var percent = 0
         var angle = 0
+        var html = ''
 
         var decimals = 0
         if (typeof me.block.decimals !== 'undefined') {
@@ -70,17 +79,17 @@ var DT_ha_gauge = (function () {
         angle = angle > 180 ? 180 : angle
         angle = angle < 0 ? 0 : angle
 
+        var rawLabel =
+            typeof me.block.title !== 'undefined' ? me.block.title : device.Name
         var ariaLabel =
-            (typeof me.block.title !== 'undefined'
-                ? me.block.title
-                : device.Name) +
+            escHtml(rawLabel) +
             ': ' +
             value +
-            (typeof me.block.Unit !== 'undefined' ? ' ' + me.block.Unit : '')
+            (typeof me.block.Unit !== 'undefined' ? ' ' + escHtml(me.block.Unit) : '')
         html =
             '<svg viewBox="-50 -50 100 80" class="ha-gauge" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="' +
             ariaLabel +
-            '">'
+            '">' 
         html += '<title>' + ariaLabel + '</title>'
 
         if (me.block.GradientColors) {
@@ -160,11 +169,7 @@ var DT_ha_gauge = (function () {
             '<text class="ha-gauge-label-text" x="0" y="10" text-anchor="middle" dominant-baseline="middle" font-size="7px" fill="' +
             color +
             '">'
-        if (typeof me.block.title !== 'undefined') {
-            html += me.block.title
-        } else {
-            html += device.Name
-        }
+        html += escHtml(rawLabel)
         html += '</text>'
 
         html += '</svg>'
@@ -197,7 +202,7 @@ var DT_ha_gauge = (function () {
 
             me.block.height = parseInt(height)
 
-            if (me.block.demo == true) {
+            if (me.block.demo === true) {
                 me.block.segments = [
                     ['0', 'green'],
                     ['33', 'yellow'],
@@ -212,7 +217,7 @@ var DT_ha_gauge = (function () {
 										 ["80", "#660000"], ["90", "#330000"], ["100", "#000000"]];
 										 */
                 //me.block.SolidColor = "green";
-                device = {
+                var device = {
                     Data: me.block.demoValue,
                     SubType: 'Custom',
                     idx: 1,

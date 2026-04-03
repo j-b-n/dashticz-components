@@ -165,10 +165,15 @@ var DT_go2rtc = (function () {
                     const handleVisibilityChange = () => {
                         if (document.hidden) {
                             videoElement.pause()
-                        } else if (videoElement.srcObject && autoplay) {
-                            videoElement.play().catch(() => {
-                                // Play failed
-                            })
+                        } else if (autoplay) {
+                            const pc = me.go2rtcData && me.go2rtcData.pc
+                            if (pc && (pc.connectionState === 'failed' || pc.connectionState === 'disconnected' || pc.connectionState === 'closed')) {
+                                DT_go2rtc.run(me)
+                            } else if (videoElement.srcObject) {
+                                videoElement.play().catch(() => {
+                                    // Play failed
+                                })
+                            }
                         }
                     }
                     document.addEventListener(
@@ -182,10 +187,15 @@ var DT_go2rtc = (function () {
                             document.body.classList.contains('standby')
                         if (isStandby) {
                             videoElement.pause()
-                        } else if (videoElement.srcObject && autoplay) {
-                            videoElement.play().catch(() => {
-                                // Play failed
-                            })
+                        } else if (autoplay) {
+                            const pc = me.go2rtcData && me.go2rtcData.pc
+                            if (pc && (pc.connectionState === 'failed' || pc.connectionState === 'disconnected' || pc.connectionState === 'closed')) {
+                                DT_go2rtc.run(me)
+                            } else if (videoElement.srcObject) {
+                                videoElement.play().catch(() => {
+                                    // Play failed
+                                })
+                            }
                         }
                     }
 
@@ -354,6 +364,7 @@ var DT_go2rtc = (function () {
                     } else if (me.go2rtcData && me.go2rtcData.iframeSrcBackup) {
                         // Restore the original src
                         iframe.src = me.go2rtcData.iframeSrcBackup
+                        me.go2rtcData.iframeSrcBackup = null
                     }
                 }
 
@@ -366,10 +377,26 @@ var DT_go2rtc = (function () {
                     attributeFilter: ['class'],
                 })
 
+                // Fallback: restore stream when page becomes visible (covers PWA
+                // resume where visibilitychange fires before standby class removal)
+                const handleIframeVisibilityChange = () => {
+                    if (!document.hidden && !document.body.classList.contains('standby')) {
+                        if (me.go2rtcData && me.go2rtcData.iframeSrcBackup) {
+                            const iframe = document.getElementById(iframeId)
+                            if (iframe) {
+                                iframe.src = me.go2rtcData.iframeSrcBackup
+                                me.go2rtcData.iframeSrcBackup = null
+                            }
+                        }
+                    }
+                }
+                document.addEventListener('visibilitychange', handleIframeVisibilityChange)
+
                 if (!me.go2rtcData) {
                     me.go2rtcData = {}
                 }
                 me.go2rtcData.iframeStandbyObserver = iframeStandbyObserver
+                me.go2rtcData.iframeVisibilityHandler = handleIframeVisibilityChange
             }
 
             // Connect WebRTC if mode is webrtc
@@ -402,6 +429,12 @@ var DT_go2rtc = (function () {
                 }
                 if (me.go2rtcData.iframeStandbyObserver) {
                     me.go2rtcData.iframeStandbyObserver.disconnect()
+                }
+                if (me.go2rtcData.iframeVisibilityHandler) {
+                    document.removeEventListener(
+                        'visibilitychange',
+                        me.go2rtcData.iframeVisibilityHandler,
+                    )
                 }
                 if (me.go2rtcData.pc) {
                     me.go2rtcData.pc.close()
